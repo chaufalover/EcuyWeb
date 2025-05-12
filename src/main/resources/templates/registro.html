@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecuy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+</head>
+
+<body>
+    <main>
+        <div class="container-fluid my-5">
+
+            <div class="row my-5 mx-5">
+                <div class="col-2 mx-5">
+                    <img src="/img/ecuypeace.png" class="img-fluid" alt="">
+                </div>
+                <div class="col">
+                    <form class="row g-3">
+                        <div class="col-md-6">
+                            <label for="inputNombre" class="form-label">Nombres</label>
+                            <input type="text" class="form-control" id="inputNombre">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputApellido" class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" id="inputApellido">
+                        </div>
+                        <div class="col-12">
+                            <label for="inputCorreo" class="form-label">Correo</label>
+                            <input type="email" class="form-control" id="inputCorreo" placeholder="ecuy@ejemplo.com">
+                        </div>
+                        <div class="col-12">
+                            <label for="inputContraseña" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="inputContraseña"
+                                placeholder="Ingresar contraseña">
+                        </div>
+                        <div class="col-12">
+                            <label for="inputRepetir" class="form-label">Repetir Contraseña</label>
+                            <input type="password" class="form-control" id="inputRepetir"
+                                placeholder="Repetir contraseña">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputUsuario" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="inputUsuario">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check mx-2">
+                                <input class="form-check-input" type="checkbox" id="gridCheck">
+                                    <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                                        data-bs-target="#staticBackdrop">
+                                        Acepto Terminos & Condiciones
+                                    </button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <a href="/"><button type="button" class="btn btn-secondary">Volver</button></a>
+                            <a href="/"><button type="button" class="btn btn-primary">Registarse</button></a>
+                             
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+     <footer th:replace="~{/fragments/template-footer :: footer}" ></footer>
+    
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Terminos y Condiciones</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <section id="objeto">
+                        <h2>1. Objeto</h2>
+                        <p>
+                            El presente documento establece los términos y condiciones que regulan el acceso, uso y
+                            participación de los usuarios en los módulos de enseñanza de lengua de señas peruana
+                            ofrecidos por la Academia "Señas para Todos".
+                        </p>
+                    </section>
+
+                    <section id="aceptacion">
+                        <h2>2. Aceptación del Usuario</h2>
+                        <p>
+                            El usuario declara haber leído, entendido y aceptado estos Términos y Condiciones antes de
+                            inscribirse en cualquiera de nuestros cursos o módulos. El uso de nuestros servicios implica
+                            la aceptación plena de los mismos.
+                        </p>
+                    </section>
+
+                    <section id="servicios">
+                        <h2>3. Servicios Ofrecidos</h2>
+                        <p>
+                            La Academia brinda módulos virtuales de enseñanza de lengua de señas peruana
+                            (LSP), dirigidos a personas oyentes y no oyentes interesadas en aprender y promover la
+                            comunicación inclusiva. Los cursos pueden ser gratuitos o de pago según la modalidad.
+                        </p>
+                    </section>
+
+                    <section id="requisitos">
+                        <h2>4. Requisitos del Usuario</h2>
+                        <ul>
+                            <li>Contar con los medios tecnológicos necesarios para acceder a los módulos virtuales
+                                (conexión a internet, dispositivo con cámara y micrófono).</li>
+                            <li>Completar correctamente el formulario de inscripción.</li>
+                        </ul>
+                    </section>
+
+                    <section id="obligaciones">
+                        <h2>5. Obligaciones del Usuario</h2>
+                        <ul>
+                            <li>Usar la plataforma de forma responsable y ética, respetando los principios de inclusión
+                                y accesibilidad promovidos por la Academia.</li>
+                            <li>No compartir su cuenta ni credenciales de acceso con terceros. La cuenta es personal e
+                                intransferible.</li>
+                            <li>No manipular ni alterar los contenidos del curso ni intentar acceder a funciones no
+                                autorizadas.</li>
+                            <li>Cumplir con las actividades y evaluaciones dentro de los plazos establecidos, cuando
+                                estos existan.</li>
+                            <li>No utilizar la plataforma para fines comerciales, políticos, religiosos ni de propaganda
+                                ajenos al propósito educativo.</li>
+                            <li>Reportar cualquier error, problema técnico o contenido inapropiado que encuentre durante
+                                su experiencia.</li>
+                            <li>No copiar, descargar ni redistribuir el contenido sin la autorización expresa de la
+                                Academia.</li>
+                            <li>Cumplir con los requisitos técnicos mínimos (dispositivo actualizado, conexión estable a
+                                internet).</li>
+                        </ul>
+                    </section>
+
+                    <section id="propiedad-intelectual">
+                        <h2>6. Propiedad Intelectual</h2>
+                        <p>
+                            Todo el material didáctico proporcionado (videos, manuales, presentaciones, ejercicios) es
+                            propiedad de la Academia "Señas para Todos" y está protegido por las leyes de propiedad
+                            intelectual. Está prohibida su reproducción o distribución sin permiso previo y por escrito.
+                        </p>
+                    </section>
+
+                    <section id="pago-devoluciones">
+                        <h2>7. Política de Pago y Devoluciones</h2>
+                        <ul>
+                            <li>Los pagos por memebresia pueden realizarse antes del inicio del módulo o despues.</li>
+                            <li>En caso de cancelación de la membresia el usuario volvera a ser no premimum acabando el
+                                mes que se pago.</li>
+                        </ul>
+                    </section>
+
+                    <section id="modificacion-terminos">
+                        <h2>8. Modificación de los Términos</h2>
+                        <p>
+                            La Academia se reserva el derecho de modificar estos Términos y Condiciones en cualquier
+                            momento. Los cambios serán notificados a los usuarios a través de los canales oficiales y
+                            entrarán en vigencia desde la fecha de su publicación.
+                        </p>
+                    </section>
+
+                    <section id="proteccion-datos">
+                        <h2>9. Protección de Datos Personales</h2>
+                        <p>
+                            La Academia garantiza la confidencialidad de los datos personales proporcionados por los
+                            usuarios y se compromete a utilizarlos exclusivamente para fines académicos y
+                            administrativos, conforme a la Ley N° 29733 – Ley de Protección de Datos Personales del
+                            Perú.
+                        </p>
+                    </section>
+
+                    <section id="contacto">
+                        <h2>10. Contacto</h2>
+                        <p>
+                            Para cualquier consulta o reclamo, el usuario puede comunicarse con el equipo de atención al
+                            correo electrónico:
+                            <a href="ecuy@gmail.com">ecuy@gmail.com</a>
+                        </p>
+                    </section>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entiendo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

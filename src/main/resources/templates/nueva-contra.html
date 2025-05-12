@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecuy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+</head>
+<body>
+   <main>
+     <div class="container">
+        <div class="row my-5 text-center">
+            <h1> Nueva Contraseña</h1>
+        </div>
+        <div class="row">
+            <p><i>A continuacion, ingresaras tu nueva contraseña.</i></p>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="my-3 mx-5 my-5">
+                    <label for="exampleFormControlInput1" class="form-label">Nueva Contraseña</label>
+                    <input type="password" class="form-control my-3" id="exampleFormControlInput1"
+                        placeholder="**********">
+                         <label for="exampleFormControlInput1" class="form-label">Repetir Nueva Contraseña</label>
+                    <input type="password" class="form-control" id="exampleFormControlInput1"
+                        placeholder="**********">
+                    <div class="container-fluid my-5">
+                        <a href="/recuperacion"><button type="button" class="btn btn-secondary btn-lg">Volver</button></a>
+                        <a href="/"><button type="button" class="btn btn-primary btn-lg">Cambiar</button></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+   </main>
+   <br>
+   <br>
+   <br>
+    <footer th:replace="~{/fragments/template-footer :: footer}" ></footer>
+</body>
+</html>
