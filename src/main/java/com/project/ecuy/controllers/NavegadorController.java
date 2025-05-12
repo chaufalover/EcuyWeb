@@ -31,4 +31,9 @@ public class NavegadorController {
     public String registro() {
         return "registro";
     }
+
+    @GetMapping("/perfil")
+    public String perfil() {
+        return "perfil";
+    }
 }
