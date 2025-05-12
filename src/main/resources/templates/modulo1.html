@@ -1,17 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecuy</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-        integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/6/2Q4d7z4l4j6e5f5l5f5l5f5l5f5l5f5l5f" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
 </head>
+
 <body>
     <header th:replace="~{/fragments/template-header :: header}"></header>
+    <br>
     <main>
-        
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-12 p-3 mb-2 bg-dark-subtle text-dark-emphasis">
+                    <h1><strong>Modulo 1</strong></h1>
+                    <h3>Introduccion</h3>
+                    <p>Introducción básica a la Lengua de Señas Peruana para promover la comunicación inclusiva y el
+                        respeto a la comunidad sorda.</p>
+                </div>
+            </div>
+            <div class="row mx-2 my-4">
+                <div class="col-12 p-3 mb-2 bg-light-subtle text-dark-emphasis">
+                    <h2><strong>1.1 Capitulo</strong></h2>
+                    <h3>Saludo en LSP</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci fugiat dolores, quos accusamus
+                        earum ullam illo enim iste rerum quod maxime sed alias quidem reiciendis, ex corporis veritatis
+                        consequuntur excepturi?</p>
+                </div>
+                <div class="container d-flex justify-content-center my-4">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/_d90pYPmoeE?si=Hu4AHrRupf0ArhQ0"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="row mx-2">
+                <h2><strong>&#128204 Evaluacion:</strong></h2>
+                <h4>&#128400 Evaluacion de Saludos en LSP</h4>
+               <div class = "container d-flex justify-content-between">
+                 <h6>1. ¿Cuál es el movimiento correcto para realizar el saludo de "Hola" en LSP?</h6>
+                 <h6><strong>5ptos</strong></h6>
+               </div>
+
+                <div class="btn-group-vertical my-4" role="group" aria-label="Vertical radio toggle button group">
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="vbtn-radio1" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="vbtn-radio1">Mano extendida moviéndose desde el frente hacia arriba con una sonrisa.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="vbtn-radio2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio2">Mano abierta cerca de la frente moviéndola hacia afuera.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="vbtn-radio3" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio3">Agitar ambas manos hacia los lados.</label>
+                     <input type="radio" class="btn-check" name="vbtn-radio" id="vbtn-radio4" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio4">Tocarse el pecho con la mano cerrada.</label>
+                </div>
+                <div class = "container d-flex justify-content-between">
+                     <h6>2. En LSP, al iniciar una conversación formal, ¿qué saludo es más adecuado?</h6>
+                     <h6><strong>5ptos</strong></h6>
+                </div>
+               
+                     <div class="btn-group-vertical my-4" role="group" aria-label="Vertical radio toggle button group">
+                    <input type="radio" class="btn-check" name="vbtn-radio1" id="vbtn-radio5" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="vbtn-radio5">Realizar el gesto de "Hola" seguido de "¿Cómo estás?" con expresión amigable.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio1" id="vbtn-radio6" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio6"> Solamente hacer el gesto de "Hola" sin contacto visual.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio1" id="vbtn-radio7" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio7">Realizar el signo de "Adiós" y luego iniciar la conversación.</label>
+                     <input type="radio" class="btn-check" name="vbtn-radio1" id="vbtn-radio8" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio8">Evitar cualquier seña de saludo.</label>
+                </div>
+                  <div class = "container d-flex justify-content-between">
+                     <h6>1. ¿Qué elemento es importante acompañar con el saludo en LSP para mostrar cortesía?</h6>
+                     <h6><strong>5ptos</strong></h6>
+                  </div>
+               
+                     <div class="btn-group-vertical my-4" role="group" aria-label="Vertical radio toggle button group">
+                    <input type="radio" class="btn-check" name="vbtn-radio3" id="vbtn-radio9" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="vbtn-radio9">Agitar las manos con rapidez.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio3" id="vbtn-radio10" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio10">Mantener contacto visual y expresión facial adecuada.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio3" id="vbtn-radio11" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio11">Realizar el signo sin mirar a la persona.</label>
+                     <input type="radio" class="btn-check" name="vbtn-radio3" id="vbtn-radio12" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio12">Solo mover la mano sin expresión facial.</label>
+                </div>
+                <div class = "container d-flex justify-content-between">
+                     <h6>2. Cuando saludas en LSP a una persona que no conoces, ¿qué expresión facial es la más correcta?</h6>
+                     <h6><strong>5ptos</strong></h5>
+                </div>
+               
+                         <div class="btn-group-vertical my-4" role="group" aria-label="Vertical radio toggle button group">
+                    <input type="radio" class="btn-check" name="vbtn-radio4" id="vbtn-radio22" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="vbtn-radio22">Seria, sin mostrar emoción.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio4" id="vbtn-radio23" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio23">Relajada, con una sonrisa ligera.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio4" id="vbtn-radio24" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio24">Molesta, para mostrar respeto.</label>
+                     <input type="radio" class="btn-check" name="vbtn-radio4" id="vbtn-radio25" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio25">Gritar fuerte para captar la atención.</label>
+                </div>
+                 <div class = "container d-flex justify-content-end"><button class = "btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            
+            Validar
+           </button></div>
+            </div>
+            <div class="row mx-2 my-4">
+                <div class="col-12 p-3 mb-2 bg-light-subtle text-dark-emphasis">
+                    <h2><strong>1.2 Capitulo</strong></h2>
+                    <h3>Despedida en LSP</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto magnam mollitia soluta. Natus
+                        iusto ex ullam, delectus, officiis dolorum ad asperiores dignissimos exercitationem quod unde
+                        modi obcaecati officia eum consequuntur? Iusto, qui libero. Aliquam minus voluptatibus nisi
+                        sapiente magni esse.</p>
+                </div>
+                <div class="container d-flex justify-content-center my-4">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/XXExgrvjHP4?si=bqPtNPcq60XjUEe1"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                
+                <h2><strong>&#128204 Evaluacion:</strong></h2>
+                <h4>&#128075 Evaluacion de despedida en LSP</h4>
+                 <div class = "container d-flex justify-content-between">
+                     <h6>1. ¿Cuál es el movimiento correcto para realizar el saludo de despedida "Adiós" en LSP?</h6>
+                     <h6><strong>10ptos</strong></h6>
+                  </div>
+               
+                     <div class="btn-group-vertical my-4" role="group" aria-label="Vertical radio toggle button group">
+                    <input type="radio" class="btn-check" name="vbtn-radio7" id="vbtn-radio91" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="vbtn-radio91"> Mano abierta cerca de la frente moviéndola hacia adelante.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio7" id="vbtn-radio92" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio92">Mano abierta al frente moviéndose de izquierda a derecha suavemente.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio7" id="vbtn-radio93" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio93">Mano extendida realizando un movimiento de apertura hacia la persona.</label>
+                     <input type="radio" class="btn-check" name="vbtn-radio7" id="vbtn-radio94" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio94">Mano abierta moviéndose de adelante hacia atrás cerca del hombro.</label>
+                </div>
+                <div class = "container d-flex justify-content-between">
+                     <h6>2. En una despedida formal en LSP, además de realizar la seña de "Adiós", ¿qué elemento es importante para mostrar respeto?</h6>
+                     <h6><strong>10ptos</strong></h5>
+                </div>
+               
+                         <div class="btn-group-vertical my-4" role="group" aria-label="Vertical radio toggle button group">
+                    <input type="radio" class="btn-check" name="vbtn-radio8" id="vbtn-radio98" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="vbtn-radio98">Desviar la mirada hacia otro lado..</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio8" id="vbtn-radio97" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio97">Acompañar con expresión facial seria o amable según el contexto.</label>
+                    <input type="radio" class="btn-check" name="vbtn-radio8" id="vbtn-radio96" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio96">Hacer la seña de "Adiós" rápidamente sin expresión.</label>
+                     <input type="radio" class="btn-check" name="vbtn-radio8" id="vbtn-radio95" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="vbtn-radio95">Solo mover la cabeza sin hacer señas.</label>
+                </div>
+            </div>
+           <div class = "container d-flex justify-content-end"><button class = "btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            
+            Validar
+           </button></div>
+        </div>
     </main>
     <footer th:replace="~{/fragments/template-footer :: footer}"></footer>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Felicidades</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        20/20
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>
