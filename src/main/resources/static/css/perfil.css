@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -6,14 +7,14 @@
 }
 
 body {
-    background-color: #e6fad7;
+    background-color: #f5f5f5;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 .cabecera-perfil {
-    background-color: #4a5d23;
+    background-color: #424242;
     padding: 20px;
     position: relative;
     display: flex;
@@ -70,7 +71,7 @@ body {
     right: 0;
     width: 30px;
     height: 30px;
-    background-color: #4CAF50;
+    background-color: #616161;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -108,7 +109,7 @@ body {
 .progreso-nivel {
     height: 100%;
     width: 60%;
-    background: linear-gradient(to right, #4CAF50, #A5DC86);
+    background: linear-gradient(to right, #616161, #9E9E9E);
     border-radius: 10px;
 }
 
@@ -184,6 +185,68 @@ body {
 
 .item-insignia.bloqueada .marcador-insignia {
     background-color: #e0e0e0;
+}
+
+.menu-config {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.boton-config {
+    width: 36px;
+    height: 36px;
+    background-color: white;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.icono-config {
+    font-size: 20px;
+}
+
+.popup-config {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    width: 200px;
+    z-index: 1000;
+    display: none;
+}
+
+.popup-config.activo {
+    display: block;
+}
+
+.opcion-config {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.opcion-config:last-child {
+    border-bottom: none;
+}
+
+.opcion-config:hover {
+    background-color: #f5f5f5;
+}
+
+.opcion-eliminar {
+    color: #e53935;
+}
+
+.opcion-eliminar:hover {
+    background-color: #ffebee;
 }
 
 @media (max-width: 768px) {

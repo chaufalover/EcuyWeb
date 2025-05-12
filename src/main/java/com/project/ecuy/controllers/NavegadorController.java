@@ -36,4 +36,9 @@ public class NavegadorController {
     public String perfil() {
         return "perfil";
     }
+
+    @GetMapping("/configuracion")
+    public String configuracion() {
+        return "configuracion";
+    }
 }

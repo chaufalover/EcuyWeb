@@ -1,0 +1,186 @@
+.titulo-config {
+    color: white;
+    font-size: 24px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.contenedor-config {
+    display: flex;
+    background-color: white;
+    border-radius: 15px;
+    margin: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.menu-lateral {
+    width: 250px;
+    background-color: #f5f5f5;
+    padding: 20px 0;
+    border-right: 1px solid #e0e0e0;
+}
+
+.lista-opciones {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.opcion-lateral {
+    padding: 15px 20px;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.opcion-lateral:hover {
+    background-color: #e8f5e9;
+    border-left-color: #4CAF50;
+}
+
+.opcion-lateral.activo {
+    background-color: #e8f5e9;
+    border-left-color: #4CAF50;
+    font-weight: bold;
+}
+
+.opcion-lateral.opcion-eliminar {
+    color: #e53935;
+}
+
+.opcion-lateral.opcion-eliminar:hover {
+    background-color: #ffebee;
+    border-left-color: #e53935;
+}
+
+.opcion-lateral.opcion-eliminar.activo {
+    background-color: #ffebee;
+    border-left-color: #e53935;
+}
+
+.contenido-config {
+    flex: 1;
+    padding: 30px;
+}
+
+.seccion-config {
+    display: none;
+}
+
+.seccion-config.activo {
+    display: block;
+}
+
+.seccion-config h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 22px;
+    border-bottom: 2px solid #4a5d23;
+    padding-bottom: 10px;
+}
+
+.formulario-config {
+    max-width: 500px;
+}
+
+.campo-formulario {
+    margin-bottom: 20px;
+}
+
+.campo-formulario label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.campo-formulario input[type="text"],
+.campo-formulario input[type="email"],
+.campo-formulario input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.campo-formulario input[disabled] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
+
+.checkbox-text {
+    font-weight: normal;
+}
+
+.boton-guardar {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.boton-guardar:hover {
+    background-color: #45a049;
+}
+
+.boton-eliminar {
+    background-color: #e53935;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.boton-eliminar:hover {
+    background-color: #d32f2f;
+}
+
+.alerta-eliminar {
+    background-color: #ffebee;
+    border-left: 4px solid #e53935;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.alerta-eliminar p {
+    margin: 0;
+    color: #c62828;
+}
+
+@media (max-width: 768px) {
+    .contenedor-config {
+        flex-direction: column;
+    }
+    
+    .menu-lateral {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .contenido-config {
+        padding: 20px;
+    }
+}
