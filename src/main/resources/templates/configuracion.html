@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecuy - Configuración</title>
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/configuracion.css">
+</head>
+<body>
+    <div class="cabecera-perfil">
+        <a href="javascript:history.back()" class="boton-regresar">
+            <span class="icono-regresar">◄</span>
+        </a>
+        
+        <h1 class="titulo-config">Configuración de la cuenta</h1>
+    </div>
+    
+    <div class="contenedor-config">
+        <div class="menu-lateral">
+            <ul class="lista-opciones">
+                <li class="opcion-lateral" data-seccion="correo">
+                    <span>Cambiar correo</span>
+                </li>
+                <li class="opcion-lateral" data-seccion="usuario">
+                    <span>Cambiar usuario</span>
+                </li>
+                <li class="opcion-lateral" data-seccion="contrasena">
+                    <span>Cambiar contraseña</span>
+                </li>
+                <li class="opcion-lateral opcion-eliminar" data-seccion="eliminar">
+                    <span>Eliminar cuenta</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="contenido-config">
+            <div class="seccion-config" id="seccion-correo">
+                <h2>Cambiar correo electrónico</h2>
+                <form class="formulario-config">
+                    <div class="campo-formulario">
+                        <label for="correo-actual">Correo actual</label>
+                        <input type="email" id="correo-actual" disabled>
+                    </div>
+                    <div class="campo-formulario">
+                        <label for="nuevo-correo">Nuevo correo</label>
+                        <input type="email" id="nuevo-correo" required>
+                    </div>
+                    <div class="campo-formulario">
+                        <label for="confirmar-correo">Confirmar nuevo correo</label>
+                        <input type="email" id="confirmar-correo" required>
+                    </div>
+                    <div class="campo-formulario">
+                        <label for="contrasena-correo">Contraseña actual</label>
+                        <input type="password" id="contrasena-correo" required>
+                    </div>
+                    <button type="submit" class="boton-guardar">Guardar cambios</button>
+                </form>
+            </div>
+            
+            <div class="seccion-config" id="seccion-usuario">
+                <h2>Cambiar nombre de usuario</h2>
+                <form class="formulario-config">
+                    <div class="campo-formulario">
+                        <label for="usuario-actual">Usuario actual</label>
+                        <input type="text" id="usuario-actual" disabled>
+                    </div>
+                    <div class="campo-formulario">
+                        <label for="nuevo-usuario">Nuevo usuario</label>
+                        <input type="text" id="nuevo-usuario" required>
+                    </div>
+                    <div class="campo-formulario">
+                        <label for="contrasena-usuario">Contraseña actual</label>
+                        <input type="password" id="contrasena-usuario" required>
+                    </div>
+                    <button type="submit" class="boton-guardar">Guardar cambios</button>
+                </form>
+            </div>
+            
+            <div class="seccion-config" id="seccion-contrasena">
+                <h2>Cambiar contraseña</h2>
+                <form class="formulario-config">
+                    <div class="campo-formulario">
+                        <label for="contrasena-actual">Contraseña actual</label>
+                        <input type="password" id="contrasena-actual" required>
+                    </div>
+                    <div class="campo-formulario">
+                        <label for="nueva-contrasena">Nueva contraseña</label>
+                        <input type="password" id="nueva-contrasena" required>
+                    </div>
+                    <div class="campo-formulario">
+                        <label for="confirmar-contrasena">Confirmar nueva contraseña</label>
+                        <input type="password" id="confirmar-contrasena" required>
+                    </div>
+                    <button type="submit" class="boton-guardar">Guardar cambios</button>
+                </form>
+            </div>
+            
+            <div class="seccion-config" id="seccion-eliminar">
+                <h2>Eliminar cuenta</h2>
+                <div class="alerta-eliminar">
+                    <p>¡Atención! Esta acción eliminará permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.</p>
+                </div>
+                <form class="formulario-config">
+                    <div class="campo-formulario">
+                        <label for="contrasena-eliminar">Introduce tu contraseña para confirmar</label>
+                        <input type="password" id="contrasena-eliminar" required>
+                    </div>
+                    <div class="campo-formulario">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="confirmar-eliminar" required>
+                            <span class="checkbox-text">Entiendo que esta acción no se puede deshacer</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="boton-eliminar">Eliminar mi cuenta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/configuracion.js"></script>
+</body>
+</html>
