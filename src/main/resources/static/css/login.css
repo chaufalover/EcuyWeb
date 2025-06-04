@@ -1,0 +1,22 @@
+main{
+     background-color: #f4ffeb;
+}
+
+main .contenedor {
+    text-align: center;
+    background-color: #c6e28a;
+    border-radius: 10px;
+}
+
+.rotacion{
+    animation: rotacion 5s infinite linear;
+}
+
+@keyframes rotacion {
+    0%{
+        transform: rotate(0);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}

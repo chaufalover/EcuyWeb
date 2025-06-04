@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head th:replace="~{/fragments/template :: head}">
+</head>
+<body>
+    <main>
+        <div class="container py-5">
+            <div class="row py-4">
+                <div class="col-sm-6">
+                    <img src="/img/star-persons.png" alt="Logo Ecuy" width="500" height="500">
+                </div>
+                <div class="col-sm-6 d-flex justify-content-center">
+                    <div class = "contenedor">
+                         <img src="/img/login-formulario.png" class = "rotacion" width = "210" height= "210">
+                         <div class="container-fluid">
+                        <div class="form-floating mb-3">
+                            <input type="usuario" class="form-control" id="floatingInput"
+                                placeholder="Ingresar usuario">
+                            <label for="floatingInput">Usuario</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="floatingPassword"
+                                placeholder="Ingresar contraseña">
+                            <label for="floatingPassword">Contraseña</label>
+                        </div>
+                        <a href="/recuperacion"><button type="button" class="btn btn-link mb-2">Recuperar contraseña</button></a>
+                        <a href="/modulos"><button type="button" class="btn btn-dark container">Inciar sesion</button></a>
+                        <a th:href="@{/registro}"><button type="button" class="btn btn-outline-dark container my-3">Crear una cuenta</button></a>
+                    </div>
+                       
+                    
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer th:replace="~{/fragments/template :: footer}">
+    </footer>
+</body>
+
+</html>

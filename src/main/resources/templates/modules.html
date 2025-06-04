@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecuy</title>
+    <link rel="stylesheet" href="/css/modules.css">
+</head>
+<body>
+    <div class="container">
+
+        <nav class="top-nav">
+            <button class="menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="user-avatar" id="profileDropdown">
+                <img src="/img/perfil.PNG" alt="Avatar de usuario">
+                <div class="dropdown-menu">
+                    <a href="/profile.html" class="dropdown-item">
+                        <i class="profile-icon"></i> Ver perfil
+                    </a>
+                    <a href="javascript:void(0)" class="dropdown-item" id="cerrarSesion">
+                        <i class="logout-icon"></i> Cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </nav>
+        
+
+        <div class="modules-container">
+
+            <div class="module-row">
+                <div class="module-card" style="background-color: #7DE4EC">
+                    <h2>Modulo</h2>
+                    <h1>1</h1>
+                </div>
+                
+                <div class="module-card" style="background-color: #FFE48E">
+                    <h2>Modulo</h2>
+                    <h1>2</h1>
+                </div>
+                
+                <div class="module-card" style="background-color: #FF9D9D">
+                    <h2>Modulo</h2>
+                    <h1>3</h1>
+                </div>
+                
+                <div class="module-card" style="background-color: #9DFFC1">
+                    <h2>Modulo</h2>
+                    <h1>4</h1>
+                </div>
+            </div>
+            
+
+            <div class="module-row">
+                <div class="module-card" style="background-color: #FFADF4">
+                    <h2>Modulo</h2>
+                    <h1>5</h1>
+                </div>
+                
+                <div class="module-card" style="background-color: #9DB6FF">
+                    <h2>Modulo</h2>
+                    <h1>6</h1>
+                </div>
+                
+                <div class="module-card" style="background-color: #D6ADFF">
+                    <h2>Modulo</h2>
+                    <h1>7</h1>
+                </div>
+                
+                <div class="module-card" style="background-color: #D4FF9D">
+                    <h2>Modulo</h2>
+                    <h1>8</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/modules.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileDropdown = document.getElementById('profileDropdown');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+            const cerrarSesionBtn = document.getElementById('cerrarSesion');
+            
+
+            function cerrarSesion() {
+
+                localStorage.removeItem('usuario');
+                localStorage.removeItem('token');
+                localStorage.removeItem('sesionIniciada');
+                
+
+                sessionStorage.clear();
+                
+
+                document.cookie.split(';').forEach(function(c) {
+                    document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+                });
+                
+
+                window.location.href = 'login.html';
+            }
+            
+
+            if (cerrarSesionBtn) {
+                cerrarSesionBtn.addEventListener('click', cerrarSesion);
+            }
+            
+
+            profileDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('active');
+            });
+            
+
+            document.addEventListener('click', function() {
+                dropdownMenu.classList.remove('active');
+            });
+            
+
+            dropdownMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
+</body>
+</html>

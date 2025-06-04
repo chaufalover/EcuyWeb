@@ -1,0 +1,328 @@
+
+.chapter-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.content-image {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.content-image img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.texto-incompleto {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.texto-con-huecos {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.hueco {
+    display: inline-block;
+    min-width: 60px;
+    min-height: 40px;
+    padding: 0 8px;
+    margin: 0 5px;
+    border-bottom: 2px dashed #2c3e50;
+    font-weight: bold;
+    vertical-align: middle;
+    font-size: 1.5rem;
+}
+
+.hueco.correcta {
+    border-bottom: 2px solid #27ae60;
+    color: #27ae60;
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+.hueco.incorrecta {
+    border-bottom: 2px solid #e74c3c;
+    color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+
+.opciones-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.emoji-option {
+    background-color: white;
+    border: 2px solid #3498db;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.emoji-option:hover {
+    transform: scale(1.05);
+    background-color: #f4f8fb;
+}
+
+.emoji-option.selected {
+    border-color: #27ae60;
+    background-color: rgba(39, 174, 96, 0.1);
+    transform: scale(1.1);
+}
+
+
+.feedback-container {
+    margin: 20px 0;
+    min-height: 50px;
+}
+
+.feedback {
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.feedback.correcto {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+    border: 1px solid #27ae60;
+}
+
+.feedback.incorrecto {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.rompecabezas-container {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 550px;
+    margin: 0 auto;
+}
+
+.rompecabezas {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.piezas-contenedor {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    width: 312px;
+    height: 312px;
+    margin: 0 auto;
+    background-color: #e0e0e0;
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.pieza {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #3498db;
+    background-color: white;
+    cursor: move;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+
+.debug-label {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    color: #333;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.pieza:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.pieza.dragging {
+    opacity: 0.5;
+    border: 2px dashed #3498db;
+    z-index: 1000;
+}
+
+.pieza.completed {
+    border: 2px solid #27ae60;
+    animation: celebrate 1s ease-in-out;
+}
+
+@keyframes celebrate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); border-color: gold; box-shadow: 0 0 15px gold; }
+    100% { transform: scale(1); }
+}
+
+
+.content-container-styled {
+    background-color: #eaf5ea; 
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    width: 95%;
+    max-width: 900px;
+}
+
+
+.content-container-styled p {
+    margin-bottom: 18px;
+    line-height: 1.6;
+    font-size: 16px;
+    letter-spacing: 0.3px;
+}
+
+.content-container-styled h2 {
+    margin-bottom: 20px;
+    color: #2e7d32; 
+    font-size: 24px;
+}
+
+.content-text {
+    width: 100%;
+    text-align: left;
+    padding: 5px 10px;
+}
+
+
+.emoji-grande {
+    font-size: 8rem;
+    text-align: center;
+    margin: 30px 0;
+    animation: pulsate 2s infinite;
+}
+
+@keyframes pulsate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+
+.opciones-contenedor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.opciones-contenedor p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.opcion-btn {
+    background-color: #f8f9fa;
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    color: #333;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 12px 25px;
+    width: 80%;
+    max-width: 300px;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.opcion-btn:hover {
+    background-color: #e9f7fe;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.opcion-btn:active {
+    transform: translateY(1px);
+}
+
+.opcion-btn.seleccionado {
+    font-weight: bold;
+}
+
+.opcion-btn.correcta {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.opcion-btn.incorrecta {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.pieza.dragging {
+    opacity: 0.5;
+    border: 2px dashed #3498db;
+}
+
+.objetivo-contenedor {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.imagen-objetivo {
+    max-width: 300px;
+    opacity: 0.6;
+    border-radius: 8px;
+}
+
+.reiniciar-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 20px auto;
+    display: block;
+}
+
+.reiniciar-btn:hover {
+    background-color: #2980b9;
+}
