@@ -1,5 +1,7 @@
 package com.project.ecuy.services;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +33,18 @@ public class UserService {
         User usuario = new User(req.getNombre(), req.getApellido(), req.getCorreo(), passwordHash, "User", req.getUsuario());
 
         repository.save(usuario);
+    }
+
+
+
+    public void restablecerPasswordConToken(String token, String nuevaPassword) {
+        User user = repository.findByResetToken(token)
+            .filter(u -> u.getTokenExpiration().isAfter(LocalDateTime.now()))
+            .orElseThrow(() -> new RuntimeException("Token inválido o expirado"));
+
+        user.setPassword(passwordEncoder.encode(nuevaPassword));
+        user.setResetToken(null);
+        user.setTokenExpiration(null);
+        repository.save(user);
     }
 }

@@ -1,5 +1,7 @@
 package com.project.ecuy.entities;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,11 +33,17 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String usuario;
-    
+
     @Column(nullable = false)
     private String rol;
 
-    public User(String nombre, String apellido, String correo, String password, String rol, String usuario){
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "token_expiracion")
+    private LocalDateTime tokenExpiration;
+
+    public User(String nombre, String apellido, String correo, String password, String rol, String usuario) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;

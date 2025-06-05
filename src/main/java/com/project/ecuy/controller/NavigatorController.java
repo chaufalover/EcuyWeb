@@ -7,11 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping
 public class NavigatorController {
-    
-    @GetMapping
-    public String login(){
-        return "login";
-    }
 
     @GetMapping("/modulos")
     public String modules(){
@@ -23,7 +18,7 @@ public class NavigatorController {
         return "chapters";
     }
 
-    @GetMapping("/perfil")
+    @GetMapping("/profile")
     public String profile(){
         return "profile";
     }
