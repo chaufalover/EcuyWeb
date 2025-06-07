@@ -1,6 +1,7 @@
 package com.project.ecuy.services;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,21 +31,42 @@ public class UserService {
 
         String passwordHash = passwordEncoder.encode(req.getPassword());
 
-        User usuario = new User(req.getNombre(), req.getApellido(), req.getCorreo(), passwordHash, "User", req.getUsuario());
+        User usuario = new User(req.getNombre(), req.getApellido(), req.getCorreo(), passwordHash, "User",
+                req.getUsuario());
+        usuario.setNombre(capitalizar(usuario.getNombre()));
+        usuario.setApellido(capitalizar(usuario.getApellido()));
 
         repository.save(usuario);
     }
 
-
-
     public void restablecerPasswordConToken(String token, String nuevaPassword) {
         User user = repository.findByResetToken(token)
-            .filter(u -> u.getTokenExpiration().isAfter(LocalDateTime.now()))
-            .orElseThrow(() -> new RuntimeException("Token inválido o expirado"));
+                .filter(u -> u.getTokenExpiration().isAfter(LocalDateTime.now()))
+                .orElseThrow(() -> new RuntimeException("Token inválido o expirado"));
 
         user.setPassword(passwordEncoder.encode(nuevaPassword));
         user.setResetToken(null);
         user.setTokenExpiration(null);
         repository.save(user);
     }
+
+    public List<User> selectAll() {
+        return repository.findAll();
+    }
+
+    public User selectOne(Integer id) {
+        return repository.findById(id).orElse(new User());
+    }
+    public void delete(Integer id) {
+        repository.deleteById(id);
+    }
+
+    public User buscarUsuario(String username) {
+        return repository.buscarUsuario(username);
+    }
+
+    public String capitalizar(String texto) {
+    if (texto == null || texto.isEmpty()) return texto;
+    return texto.substring(0, 1).toUpperCase() + texto.substring(1).toLowerCase();
+}
 }

@@ -18,9 +18,4 @@ public class NavigatorController {
         return "chapters";
     }
 
-    @GetMapping("/profile")
-    public String profile(){
-        return "profile";
-    }
-
 }
