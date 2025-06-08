@@ -14,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/activity-response")
 public class ActivityResponseController {
@@ -49,7 +51,7 @@ public class ActivityResponseController {
             
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
-            User user = userService.findByUsername(username)
+            User user = Optional.ofNullable(userService.buscarUsuario(username))
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             
             
@@ -139,7 +141,7 @@ public class ActivityResponseController {
         
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        User user = userService.findByUsername(username)
+        User user = Optional.ofNullable(userService.buscarUsuario(username))
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
                 
         

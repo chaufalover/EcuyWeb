@@ -309,9 +309,12 @@
                         <a href="/perfil" class="dropdown-item">
                             <i class="fas fa-user"></i> Ver perfil
                         </a>
-                        <a href="#" class="dropdown-item" th:href="@{/logout}">
+                        <a href="#" class="dropdown-item" onclick="document.getElementById('logoutForm').submit(); return false;">
                             <i class="fas fa-sign-out-alt"></i> Cerrar sesión
                         </a>
+                        <form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        </form>
                     </div>
                 </div>
             </div>
@@ -424,26 +427,43 @@
             const profileDropdown = document.getElementById('profileDropdown');
             const profileMenu = document.getElementById('profileMenu');
             
-            if (profileDropdown) {
+            // Toggle dropdown menu
+            if (profileDropdown && profileMenu) {
                 profileDropdown.addEventListener('click', function(e) {
                     e.stopPropagation();
                     profileMenu.classList.toggle('show');
                 });
             }
             
-            
+            // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
-                if (profileMenu && !profileDropdown.contains(e.target)) {
+                if (profileMenu && profileDropdown && !profileDropdown.contains(e.target)) {
                     profileMenu.classList.remove('show');
                 }
             });
-            
-            
-            const menuBtn = document.getElementById('menuBtn');
-            if (menuBtn) {
-                menuBtn.addEventListener('click', function() {
-                
-                    console.log('Menú clickeado');
+
+            // Handle logout functionality
+            const logoutForm = document.getElementById('logoutForm');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Clear local storage
+                    localStorage.removeItem('usuario');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('sesionIniciada');
+
+                    // Clear session storage
+                    sessionStorage.clear();
+
+
+                    // Clear cookies
+                    document.cookie.split(';').forEach(function(c) {
+                        document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+                    });
+
+                    // Submit the form
+                    this.submit();
                 });
             }
         });
