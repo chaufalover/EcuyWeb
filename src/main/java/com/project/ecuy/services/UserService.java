@@ -1,6 +1,7 @@
 package com.project.ecuy.services;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,14 @@ public class UserService {
         user.setResetToken(null);
         user.setTokenExpiration(null);
         repository.save(user);
+    }
+    
+    /**
+     * 
+     * @param username 
+     * @return 
+     */
+    public Optional<User> findByUsername(String username) {
+        return repository.findByUsuario(username);
     }
 }

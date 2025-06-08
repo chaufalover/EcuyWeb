@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Actividad: ' + ${actividad.titulo}">Actividad</title>
+    
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .activity-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .activity-header {
+            border-bottom: 1px solid #e3e6f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .activity-title {
+            color: #4e73df;
+            margin-bottom: 0.5rem;
+        }
+        .activity-content {
+            line-height: 1.8;
+            color: #5a5c69;
+        }
+        .btn-back {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a th:href="@{/modulo/__${moduloId}__}" class="btn btn-outline-secondary btn-back">
+            <i class="fas fa-arrow-left me-2"></i> Volver al módulo
+        </a>
+        
+        <div class="activity-container">
+            <div class="activity-header">
+                <h1 class="activity-title" th:text="${actividad.titulo}">Título de la actividad</h1>
+                <div class="text-muted">
+                    <i class="fas fa-book-reader me-2"></i> Actividad de lectura
+                </div>
+            </div>
+            
+            <div class="activity-content">
+                <div th:if="${actividad.descripcion}" class="mb-4">
+                    <p th:text="${actividad.descripcion}"></p>
+                </div>
+                
+                <div th:each="contenido : ${actividad.contenidos}" class="mb-4">
+                    <div th:if="${contenido.tipoContenido == 'TEXTO'}" th:utext="${contenido.contenido}">
+                        
+                    </div>
+                    <div th:if="${contenido.tipoContenido == 'IMAGEN'}" class="text-center my-4">
+                        <img th:src="${contenido.urlArchivo}" alt="Imagen de la actividad" class="img-fluid rounded">
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="d-flex justify-content-between mt-4">
+                <div>
+                    <a th:if="${actividadAnteriorId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadAnteriorId})}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Anterior
+                    </a>
+                </div>
+                <div>
+                    <a id="btnNextActivity" 
+                       th:if="${actividadSiguienteId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadSiguienteId})}" 
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>Siguiente actividad
+                    </a>
+                    <a th:if="${actividadSiguienteId == null}" 
+                       th:href="@{/modulo/__${moduloId}__}" 
+                       class="btn btn-success"
+                       id="btnBackToModule">
+                        <i class="fas fa-check-circle me-2"></i>Volver al módulo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        
+        function cargarActividad(actividadId) {
+            console.log('Cargando actividad:', actividadId);
+            if (actividadId) {
+                window.location.href = '/actividad/' + actividadId;
+            } else {
+                console.error('ID de actividad no válido');
+            }
+        }
+        
+        
+        function marcarComoCompletada() {
+            const actividadId = /*[[${actividad.id}]]*/ 0;
+            const actividadSiguienteId = /*[[${actividadSiguienteId}]]*/ null;
+            const moduloId = /*[[${moduloId}]]*/ 0;
+            
+            console.log('Marcando actividad como completada:', { actividadId, actividadSiguienteId, moduloId });
+            
+            
+            const boton = document.querySelector('.btn-success');
+            const textoOriginal = boton.innerHTML;
+            boton.disabled = true;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Procesando...';
+            
+            
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+            
+            if (!csrfToken || !csrfHeader) {
+                console.error('No se encontró el token CSRF');
+                boton.disabled = false;
+                boton.innerHTML = textoOriginal;
+                mostrarError('Error de seguridad. Por favor, recarga la página.');
+                return;
+            }
+            
+            console.log('Enviando solicitud a /api/actividad/' + actividadId + '/completar');
+            console.log('Token CSRF:', csrfToken);
+            console.log('Header CSRF:', csrfHeader);
+            
+            fetch('/api/actividad/' + actividadId + '/completar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(async response => {
+                console.log('Respuesta del servidor - Estado:', response.status);
+                console.log('Cabeceras:', Object.fromEntries([...response.headers.entries()]));
+                
+                
+                const responseText = await response.text();
+                console.log('Cuerpo de la respuesta (texto):', responseText);
+                
+                let responseData;
+                try {
+                    responseData = responseText ? JSON.parse(responseText) : {};
+                } catch (e) {
+                    console.error('Error al analizar la respuesta JSON:', e);
+                    throw new Error('Respuesta del servidor no válida');
+                }
+                
+                if (!response.ok) {
+                    console.error('Error en la respuesta:', response.status, response.statusText);
+                    console.error('Detalles del error:', responseData);
+                    
+                    let errorMessage = 'Error al marcar como completada';
+                    if (responseData && responseData.message) {
+                        errorMessage = responseData.message;
+                    } else if (response.status === 403) {
+                        errorMessage = 'No tienes permiso para realizar esta acción';
+                    } else if (response.status === 401) {
+                        errorMessage = 'No estás autenticado. Por favor, inicia sesión nuevamente.';
+                    } else if (response.status === 404) {
+                        errorMessage = 'Actividad no encontrada';
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+                
+                return responseData;
+            })
+            .then(data => {
+                console.log('Datos de respuesta procesados:', data);
+                
+                if (data && data.success) {
+                    
+                    if (actividadSiguienteId) {
+                        console.log('Redirigiendo a la siguiente actividad:', actividadSiguienteId);
+                        cargarActividad(actividadSiguienteId);
+                    } else {
+                        
+                        console.log('No hay más actividades, volviendo al módulo:', moduloId);
+                        window.location.href = '/modulo/' + moduloId;
+                    }
+                } else {
+                    throw new Error(data && data.message ? data.message : 'No se pudo completar la acción');
+                }
+            })
+            .catch(error => {
+                console.error('Error en la solicitud:', error);
+                mostrarError('Error al marcar la actividad como completada: ' + (error.message || 'Error desconocido'));
+            })
+            .finally(() => {
+                
+                if (boton) {
+                    boton.disabled = false;
+                    boton.innerHTML = textoOriginal;
+                }
+            });
+        }
+        
+        function mostrarError(mensaje) {
+            
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '20px';
+            modal.style.right = '20px';
+            modal.style.backgroundColor = '#f8d7da';
+            modal.style.color = '#721c24';
+            modal.style.padding = '15px 20px';
+            modal.style.borderRadius = '5px';
+            modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            modal.style.zIndex = '9999';
+            modal.style.maxWidth = '400px';
+            modal.style.wordBreak = 'break-word';
+            modal.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <strong><i class="fas fa-exclamation-triangle me-2"></i>Error:</strong>
+                        <span>${mensaje}</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: inherit; cursor: pointer; margin-left: 15px;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            
+            setTimeout(() => {
+                if (document.body.contains(modal)) {
+                    document.body.removeChild(modal);
+                }
+            }, 10000);
+        }
+        
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página cargada');
+            
+            
+            const actividadSiguienteId = /*[[${actividadSiguienteId}]]*/ null;
+            console.log('Actividad siguiente:', actividadSiguienteId);
+            
+            
+            const actividadAnteriorId = /*[[${actividadAnteriorId}]]*/ null;
+            console.log('Actividad anterior:', actividadAnteriorId);
+        });
+        /*]]>*/
+    </script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

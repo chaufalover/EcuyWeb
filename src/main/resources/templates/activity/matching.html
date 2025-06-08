@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Relacionar: ' + ${actividad.titulo}">Actividad de Relacionar</title>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .activity-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .drop-zone {
+            min-height: 80px;
+            border: 2px dashed #6c757d;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        .drop-zone.highlight {
+            background-color: #e2f0fd;
+            border-color: #4a90e2;
+        }
+        .drop-zone.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .drop-zone.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .description-item {
+            cursor: move;
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .description-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        .description-text {
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .description-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+        .item-image {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .item-image img {
+            max-height: 180px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        .drop-hint {
+            color: #6c757d;
+            font-style: italic;
+        }
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+            .col-md-6 {
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a th:href="@{/modulo/__${moduloId}__}" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left me-2"></i> Volver al módulo
+        </a>
+        
+        <div class="activity-container">
+            <h2 class="mb-4" th:text="'Relacionar: ' + ${actividad.titulo}">Relacionar elementos</h2>
+            
+            
+            <div id="mensaje-alerta" class="mb-3"></div>
+            
+            
+            <div class="alert alert-info" th:if="${actividad.descripcion}" th:utext="${actividad.descripcion}">
+                Arrastra cada descripción a su imagen correspondiente.
+            </div>
+            
+            
+            <div id="result-message" class="text-center mt-3" style="display: none;">
+                <div class="alert mb-0" role="alert"></div>
+            </div>
+            
+            <div class="row">
+                
+                <div class="col-md-6">
+                    <div class="items-list">
+                        <div th:each="item : ${actividad.paresRelacionados}" class="item-container mb-4">
+                            
+                            <div class="item-image">
+                                <img th:if="${item.urlImagen}" 
+                                     th:src="${item.urlImagen}" 
+                                     class="img-fluid" 
+                                     alt="Imagen">
+                            </div>
+                            
+                            
+                            <div class="drop-zone" 
+                                 th:data-item-id="${item.id}">
+                                <span class="drop-hint">Arrastra aquí la descripción</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <div class="col-md-6">
+                    <h5 class="text-center mb-3">Descripciones</h5>
+                    <div class="descriptions-list">
+                        <div th:each="item, stat : ${actividad.paresRelacionados}" 
+                             class="description-item draggable" 
+                             draggable="true"
+                             th:data-item-id="${item.id}">
+                            <div class="description-text">
+                                <span th:if="${item.textoDescripcion}" 
+                                      th:text="${item.textoDescripcion}">
+                                    Descripción
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                <div>
+                    <a th:if="${actividadAnteriorId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadAnteriorId})}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Anterior
+                    </a>
+                    <a th:if="${actividadAnteriorId == null}" 
+                       class="btn btn-outline-secondary disabled" 
+                       tabindex="-1" 
+                       aria-disabled="true">
+                        <i class="fas fa-arrow-left me-2"></i>Anterior
+                    </a>
+                </div>
+                
+                <div>
+                    <button id="btnCheck" class="btn btn-primary" type="button">
+                        <i class="fas fa-check-circle me-2"></i>Verificar
+                    </button>
+                </div>
+                
+                <div>
+                    <a id="btnNextActivity" 
+                       th:if="${actividadSiguienteId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadSiguienteId})}" 
+                       class="btn btn-primary"
+                       disabled>
+                        <i class="fas fa-arrow-right me-2"></i>Siguiente Actividad
+                    </a>
+                    <a th:if="${actividadSiguienteId == null}" 
+                       class="btn btn-outline-secondary disabled" 
+                       tabindex="-1" 
+                       aria-disabled="true">
+                        <i class="fas fa-check me-2"></i>Última actividad
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script th:inline="javascript">
+        
+        function mostrarMensaje(tipo, mensaje, duracion = 5000) {
+            const contenedorMensaje = document.getElementById('mensaje-alerta');
+            
+            if (!contenedorMensaje) {
+                console.error('No se encontró el contenedor de mensajes');
+                return;
+            }
+            
+            
+            let mensajeElement = contenedorMensaje.querySelector('.alert');
+            
+            if (!mensajeElement) {
+                mensajeElement = document.createElement('div');
+                mensajeElement.className = `alert alert-${tipo} alert-dismissible fade show`;
+                mensajeElement.role = 'alert';
+                mensajeElement.innerHTML = `
+                    ${mensaje}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                `;
+                contenedorMensaje.appendChild(mensajeElement);
+            } else {
+                
+                mensajeElement.className = `alert alert-${tipo} alert-dismissible fade show`;
+                mensajeElement.innerHTML = `
+                    ${mensaje}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                `;
+            }
+            
+            
+            mensajeElement.style.display = 'block';
+            
+            
+            if (duracion > 0) {
+                setTimeout(() => {
+                    mensajeElement.style.display = 'none';
+                }, duracion);
+            }
+            
+            
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const resultMessage = document.getElementById('result-message');
+            const resultAlert = resultMessage ? resultMessage.querySelector('.alert') : null;
+            const btnCheck = document.getElementById('btnCheck');
+            const btnNext = document.getElementById('btnNextActivity');
+            
+            
+            let draggedItem = null;
+            
+            
+            document.querySelectorAll('.description-item').forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+            
+            
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+            
+            
+            btnCheck.addEventListener('click', function() {
+                const todasCorrectas = checkAllConnections();
+                if (todasCorrectas) {
+                    marcarComoCompletada();
+                }
+            });
+            
+            
+            function handleDragStart(e) {
+                draggedItem = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', this.getAttribute('data-item-id'));
+            }
+            
+            function handleDragEnd() {
+                this.classList.remove('dragging');
+            }
+            
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+            
+            function handleDragEnter(e) {
+                e.preventDefault();
+                this.classList.add('highlight');
+            }
+            
+            function handleDragLeave() {
+                this.classList.remove('highlight');
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                this.classList.remove('highlight');
+                
+                
+                const itemId = e.dataTransfer.getData('text/plain');
+                const draggedElement = document.querySelector(`.description-item[data-item-id="${itemId}"]`);
+                
+                if (draggedElement) {
+                    
+                    const previousZone = draggedElement.closest('.drop-zone');
+                    if (previousZone) {
+                        previousZone.innerHTML = '<span class="drop-hint">Arrastra aquí la descripción</span>';
+                        previousZone.classList.remove('correct', 'incorrect');
+                        
+                        
+                        const originalElement = document.querySelector(`.descriptions-list [data-item-id="${itemId}"]`);
+                        if (originalElement) {
+                            originalElement.style.display = 'block';
+                        }
+                    }
+                    
+                    
+                    this.innerHTML = '';
+                    this.classList.remove('correct', 'incorrect');
+                    
+                    
+                    const clonedElement = draggedElement.cloneNode(true);
+                    this.appendChild(clonedElement);
+                    
+                    
+                    draggedElement.style.display = 'none';
+                    
+                    
+                    if (btnNext) {
+                        btnNext.disabled = true;
+                        btnNext.classList.remove('btn-success');
+                        btnNext.classList.add('btn-outline-success');
+                    }
+                }
+            }
+            
+            
+            function checkAllConnections() {
+                try {
+                    const dropZones = document.querySelectorAll('.drop-zone');
+                    let allCorrect = true;
+                    let completedPairs = 0;
+                    const totalPairs = document.querySelectorAll('.item-container').length;
+                    
+                    dropZones.forEach(zone => {
+                        const itemId = zone.getAttribute('data-item-id');
+                        const content = zone.querySelector('.description-text');
+                        
+                        if (content) {
+                            const contentId = content.closest('.description-item').getAttribute('data-item-id');
+                            const isCorrect = itemId === contentId;
+                            
+                            
+                            if (isCorrect) {
+                                zone.classList.remove('incorrect');
+                                
+                    if (btnNext && !btnNext.disabled) {
+                        btnNext.disabled = true;
+                        btnNext.classList.remove('btn-success');
+                        btnNext.classList.add('btn-outline-success');
+                    }
+                                zone.classList.add('correct');
+                                completedPairs++;
+                            } else {
+                                zone.classList.remove('correct');
+                                zone.classList.add('incorrect');
+                                allCorrect = false;
+                            }
+                        } else {
+                            allCorrect = false;
+                        }
+                    });
+                    
+                    
+                    if (resultMessage && resultAlert) {
+                        if (allCorrect && completedPairs === totalPairs) {
+                            resultAlert.textContent = '¡Excelente! Has relacionado correctamente todos los elementos.';
+                            resultAlert.className = 'alert alert-success';
+                            resultMessage.style.display = 'block';
+                            
+                            
+                            if (btnNext) {
+                                btnNext.disabled = false;
+                                btnNext.classList.remove('btn-outline-success');
+                                btnNext.classList.add('btn-success');
+                            }
+                            
+                            
+                            return true;
+                        } else if (completedPairs === 0) {
+                            resultAlert.textContent = 'Por favor, relaciona al menos un par de elementos antes de verificar.';
+                            resultAlert.className = 'alert alert-warning';
+                            resultMessage.style.display = 'block';
+                        } else {
+                            resultAlert.textContent = `Tienes ${completedPairs} de ${totalPairs} elementos correctamente relacionados. Sigue intentando.`;
+                            resultAlert.className = 'alert alert-warning';
+                            resultMessage.style.display = 'block';
+                        }
+                    }
+                    
+                    return allCorrect && completedPairs === totalPairs;
+                } catch (error) {
+                    console.error('Error al verificar conexiones:', error);
+                    if (resultAlert) {
+                        resultAlert.textContent = 'Ocurrió un error al verificar las respuestas. Por favor, inténtalo de nuevo.';
+                        resultAlert.className = 'alert alert-danger';
+                        resultMessage.style.display = 'block';
+                    }
+                    return false;
+                }
+            }
+            
+            
+            function marcarComoCompletada() {
+                
+                const actividadId = /*[[${actividad.id}]]*/ '0';
+                const moduloId = /*[[${moduloId}]]*/ '0';
+                const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                
+                
+                const dropZones = document.querySelectorAll('.drop-zone');
+                let todasCorrectas = true;
+                let completedPairs = 0;
+                const totalPairs = document.querySelectorAll('.item-container').length;
+                
+                dropZones.forEach(zone => {
+                    const itemId = zone.getAttribute('data-item-id');
+                    const content = zone.querySelector('.description-text');
+                    
+                    if (content) {
+                        const contentId = content.closest('.description-item').getAttribute('data-item-id');
+                        const isCorrect = itemId === contentId;
+                        
+                        if (isCorrect) {
+                            completedPairs++;
+                        } else {
+                            todasCorrectas = false;
+                        }
+                    } else {
+                        todasCorrectas = false;
+                    }
+                });
+                
+                
+                todasCorrectas = todasCorrectas && (completedPairs === totalPairs);
+                
+                
+                mostrarMensaje('info', 'Verificando tus respuestas...');
+                
+                
+                return fetch('/api/activity-response/' + actividadId + '/submit?isCorrect=' + todasCorrectas, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        [header]: token
+                    },
+                    credentials: 'same-origin',
+                    body: ''
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Respuesta del servidor:', data);
+                    
+                    if (data.success) {
+                        
+                        if (data.alreadyCompleted) {
+                            if (todasCorrectas) {
+                                
+                                mostrarMensaje('success', '¡Respuesta correcta! Ya habías completado esta actividad.');
+                                
+                                if (data.moduloCompletado) {
+                                    mostrarBotonSiguienteActividad(actividadId, moduloId);
+                                }
+                            } else {
+                                mostrarMensaje('info', 'La actividad ya estaba completada. Corrige los errores para mejorar tu puntuación.');
+                            }
+                            return true;
+                        }
+                        
+                        
+                        if (todasCorrectas) {
+                            mostrarMensaje('success', data.message || '¡Todas las respuestas son correctas! Has ganado 5 puntos.');
+                            
+                            
+                            if (data.moduloCompletado) {
+                                mostrarBotonSiguienteActividad(actividadId, moduloId);
+                            }
+                            return true;
+                        } else {
+                            mostrarMensaje('error', data.message || 'Algunas respuestas son incorrectas. Por favor, verifica tus conexiones.');
+                            return false;
+                        }
+                    } else {
+                        console.error('No se pudo registrar la actividad:', data);
+                        mostrarMensaje('error', data.message || 'No se pudo registrar tu actividad. Por favor, inténtalo de nuevo.');
+                        return false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al marcar la actividad como completada:', error);
+                    mostrarMensaje('error', 'Error al verificar tus respuestas. Por favor, inténtalo de nuevo.');
+                    return false;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

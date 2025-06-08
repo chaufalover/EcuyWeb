@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Rompecabezas: ' + ${actividad.titulo}">Actividad de Rompecabezas</title>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .activity-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .puzzle-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        
+        .puzzle-pieces-container {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: #e9ecef;
+            border-radius: 8px;
+        }
+        
+        .puzzle-pieces {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1rem;
+            min-height: 150px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        
+        .puzzle-board {
+            width: 450px;
+            height: 450px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 2px;
+            background-color: #ddd;
+            border: 2px solid #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .puzzle-slot {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .puzzle-slot:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        
+        .puzzle-piece {
+            width: 80px;
+            height: 80px;
+            margin: 5px;
+            background-size: 300% 300%;
+            background-repeat: no-repeat;
+            cursor: move;
+            transition: all 0.2s ease;
+            display: inline-block;
+            vertical-align: top;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+            touch-action: none; 
+        }
+        
+        .puzzle-piece.dragging {
+            opacity: 0.7;
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        
+        .puzzle-slot {
+            background-color: #fff;
+            border: 1px solid #6c757d;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .puzzle-slot.highlight {
+            background-color: rgba(78, 115, 223, 0.3);
+            border: 2px dashed #4e73df;
+        }
+        
+        .puzzle-slot.correct {
+            border: 2px solid #1cc88a;
+        }
+        
+        .puzzle-piece {
+            width: 100%;
+            height: 100%;
+            background-size: 450px 450px; 
+            background-repeat: no-repeat;
+            cursor: move;
+            transition: transform 0.2s;
+        }
+        
+        .puzzle-piece:hover {
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .puzzle-piece.dragging {
+            opacity: 0.7;
+            transform: scale(1.1);
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .puzzle-piece.placed {
+            cursor: default;
+        }
+        .puzzle-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+        .puzzle-feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .puzzle-feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .puzzle-board.completed .puzzle-slot {
+            border-color: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+        }
+        
+        .puzzle-board {
+            width: 100%;
+            max-width: 500px;
+            height: 500px; 
+            margin: 0 auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 1px;
+        }
+        
+        .puzzle-row {
+            display: contents; 
+        }
+        
+        .puzzle-cell {
+            position: relative;
+            border: 2px solid #dee2e6;
+            background-size: 300% 300%;
+            background-position: center center;
+            background-repeat: no-repeat;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fc;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        .puzzle-cell.empty {
+            background-color: #f8f9fc;
+            border-style: dashed;
+        }
+        
+        .puzzle-cell.occupied {
+            background-color: #ffffff;
+            border-style: solid;
+        }
+        
+        .puzzle-cell.correct {
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+            border: 2px solid #28a745;
+        }
+        
+        .puzzle-cell.drag-over {
+            background-color: rgba(78, 115, 223, 0.2);
+            border: 2px dashed #4e73df;
+        }
+        
+        .puzzle-cell.drag-over::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.05);
+            z-index: 1;
+        }
+        
+        
+        .puzzle-piece {
+            transition: transform 0.1s, opacity 0.1s;
+        }
+        
+        .puzzle-piece.dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+        
+        .puzzle-piece.hide-while-dragging {
+            visibility: hidden;
+        }
+        
+        .puzzle-piece-placed {
+            pointer-events: none; 
+        }
+        
+        .puzzle-pieces-container {
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+        
+        #puzzlePieces {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .puzzle-piece {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: move;
+            background-size: 300% 300%;
+            background-repeat: no-repeat;
+        }
+        
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .puzzle-piece.dragging {
+            opacity: 0.5;
+            transform: scale(0.9);
+        }
+        
+        .puzzle-pieces {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a th:href="@{/modulo/__${moduloId}__}" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left me-2"></i> Volver al módulo
+        </a>
+        
+        <div class="activity-container">
+            <h1 class="text-center mb-4" th:text="'Rompecabezas: ' + ${actividad.titulo}">Rompecabezas</h1>
+            
+            <div class="puzzle-container">
+                <div class="text-center mb-4">
+                    <p class="lead">
+                        Arrastra las piezas para completar el rompecabezas 3x3.
+                    </p>
+                </div>
+                
+                <div id="puzzleBoard" class="puzzle-board mb-4">
+                    
+                </div>
+                
+                <div class="puzzle-pieces-container">
+                    <h4>Arrastra las piezas al tablero</h4>
+                    <div id="puzzlePieces">
+                        
+                    </div>
+                </div>
+                
+                
+                <div id="feedback" class="mt-3 text-center"></div>
+            </div>
+            
+            
+            <div class="d-flex justify-content-between mt-4">
+                <div>
+                    <a th:if="${actividadAnteriorId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadAnteriorId})}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Anterior
+                    </a>
+                </div>
+                <div>
+                    <button id="btnCheck" class="btn btn-primary me-2">
+                        <i class="fas fa-check-circle me-2"></i>Verificar
+                    </button>
+                    <a id="btnNextActivity" 
+                       th:if="${actividadSiguienteId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadSiguienteId})}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-right me-2"></i>Siguiente actividad
+                    </a>
+                    <a th:if="${actividadSiguienteId == null}" 
+                       th:href="@{/modulo/__${moduloId}__}" 
+                       class="btn btn-success"
+                       id="btnBackToModule">
+                        <i class="fas fa-check-circle me-2"></i>¡Completado! Volver al módulo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        
+        let currentPuzzle = [];
+        let emptyPosition = { row: 2, col: 2 }; 
+        let totalPieces = 8; 
+        let isCompleted = false;
+        
+        
+        window.mostrarMensaje = function(tipo, mensaje, duracion = 5000) {
+            try {
+                console.log('Mostrando mensaje:', {tipo, mensaje, duracion});
+                const $toast = $(`
+                    <div class="toast align-items-center text-white bg-${tipo} border-0 position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                                ${mensaje}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `);
+                
+                
+                $('body').append($toast);
+                
+                
+                const toast = new bootstrap.Toast($toast[0], {
+                    animation: true,
+                    autohide: true,
+                    delay: duracion
+                });
+                
+                toast.show();
+                
+                
+                $toast.on('hidden.bs.toast', function () {
+                    $(this).remove();
+                });
+            } catch (error) {
+                console.error('Error en mostrarMensaje:', error);
+            }
+        };
+        
+        
+        window.verificarSolucion = function(mostrarMensajes = true) {
+            try {
+                console.log('Verificando solución...');
+                const $celdas = $('.puzzle-cell');
+                let piezasColocadas = 0;
+                let piezasCorrectas = 0;
+                
+                $celdas.each(function() {
+                    const $celda = $(this);
+                    const $pieza = $celda.find('.puzzle-piece-placed');
+                    
+                    if ($pieza.length) {
+                        piezasColocadas++;
+                        const row = parseInt($pieza.data('row'));
+                        const col = parseInt($pieza.data('col'));
+                        const celdaRow = parseInt($celda.data('row'));
+                        const celdaCol = parseInt($celda.data('col'));
+                        
+                        if (row === celdaRow && col === celdaCol) {
+                            piezasCorrectas++;
+                        }
+                    }
+                });
+                
+                const estaCompleto = piezasColocadas === totalPieces && piezasCorrectas === totalPieces;
+                
+                
+                if (mostrarMensajes && window.mostrarMensaje) {
+                    if (estaCompleto) {
+                        window.mostrarMensaje('success', '¡Felicidades! Has completado el rompecabezas correctamente.');
+                        marcarComoCompletada(true); 
+                    } else if (piezasColocadas === totalPieces) {
+                        const incorrectas = piezasColocadas - piezasCorrectas;
+                        window.mostrarMensaje('warning', `Tienes ${incorrectas} pieza(s) en la posición incorrecta. ¡Ajusta las piezas!`);
+                        marcarComoCompletada(false); 
+                    } else if (piezasColocadas > 0) {
+                        window.mostrarMensaje('info', `Tienes ${piezasColocadas} de ${totalPieces} piezas colocadas.`);
+                    } else {
+                        window.mostrarMensaje('info', 'Arrastra las piezas al tablero para comenzar.');
+                    }
+                }
+                
+                console.log('Verificación completada. Resultado:', {estaCompleto, piezasColocadas, piezasCorrectas});
+                return estaCompleto;
+            } catch (error) {
+                console.error('Error en verificarSolucion:', error);
+                return false;
+            }
+        };
+        
+        
+        window.verificarRompecabezas = function() {
+            try {
+                console.log('Botón Verificar clickeado');
+                
+                const resultado = window.verificarSolucion(true);
+                console.log('Resultado de verificarSolucion:', resultado);
+                return resultado;
+            } catch (error) {
+                console.error('Error en verificarRompecabezas:', error);
+                return false;
+            }
+        };
+        
+
+        
+        
+        $(document).ready(function() {
+            
+            cargarRompecabezas();
+            
+            
+            $('#btnCheck').click(verificarRompecabezas);
+            
+            
+            mostrarMensaje('info', 'Arrastra las piezas al tablero para comenzar. Usa el botón Verificar para comprobar tu solución.');
+        });
+        
+        
+        function cargarRompecabezas() {
+            
+            const imagenUrl = /*[[${actividad.urlImagenRompecabezas}]]*/ '';
+            
+            if (!imagenUrl) {
+                mostrarMensaje('error', 'No se ha configurado una imagen para este rompecabezas.');
+                return;
+            }
+            
+            
+            inicializarTablero(imagenUrl);
+        }
+        
+        
+        function inicializarTablero(imagenUrl) {
+            const $puzzleBoard = $('#puzzleBoard');
+            const $puzzlePieces = $('#puzzlePieces');
+            
+            
+            $puzzleBoard.empty();
+            $puzzlePieces.empty();
+            
+            
+            const filas = 3;
+            const columnas = 3;
+            
+            
+            for (let i = 0; i < filas; i++) {
+                for (let j = 0; j < columnas; j++) {
+                    
+                    const $celda = $('<div class="puzzle-cell empty" data-row="' + i + '" data-col="' + j + '"></div>');
+                    
+                    
+                    $celda[0].addEventListener('dragover', onPuzzleDragOver);
+                    $celda[0].addEventListener('drop', onPuzzleDrop);
+                    $celda[0].addEventListener('dragleave', onDragLeave);
+                    
+                    
+                    $celda[0].addEventListener('dragenter', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+                    
+                    $puzzleBoard.append($celda);
+                }
+            }
+            
+            
+            $('.puzzle-piece').each(function() {
+                this.setAttribute('draggable', 'true');
+                this.addEventListener('dragstart', onPuzzleDragStart);
+                this.addEventListener('dragend', onPuzzleDragEnd);
+            });
+            
+            
+            const piezas = [];
+            
+            for (let i = 0; i < filas; i++) {
+                for (let j = 0; j < columnas; j++) {
+                    
+                    if (i === filas - 1 && j === columnas - 1) continue;
+                    
+                    piezas.push({ row: i, col: j });
+                }
+            }
+            
+            
+            for (let i = piezas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [piezas[i], piezas[j]] = [piezas[j], piezas[i]];
+            }
+            
+            
+            piezas.forEach(pieza => {
+                const { row, col } = pieza;
+                const $pieza = $('<div class="puzzle-piece" draggable="true"></div>')
+                    .attr('data-row', row)
+                    .attr('data-col', col);
+                
+                
+                const posX = (col / (columnas - 1)) * 100 + '%';
+                const posY = (row / (filas - 1)) * 100 + '%';
+                const bgSize = (columnas) * 100 + '% ' + (filas) * 100 + '%';
+                
+                
+                $pieza.css({
+                    'background-image': 'url(' + imagenUrl + ')',
+                    'background-position': posX + ' ' + posY,
+                    'background-size': bgSize,
+                    'background-repeat': 'no-repeat',
+                    'width': '80px',
+                    'height': '80px',
+                    'display': 'inline-block',
+                    'margin': '5px',
+                    'border': '2px solid #dee2e6',
+                    'border-radius': '4px',
+                    'cursor': 'move',
+                    'transition': 'all 0.2s ease',
+                    'vertical-align': 'top'
+                });
+                
+                
+                $pieza[0].addEventListener('dragstart', onPuzzleDragStart);
+                $pieza[0].addEventListener('dragend', onPuzzleDragEnd);
+                
+                $puzzlePieces.append($pieza);
+            });
+            
+            
+            barajarPiezas();
+        }
+        
+        
+        function barajarPiezas() {
+            const celdas = $('.puzzle-cell:not(.empty)').toArray();
+            const valores = celdas.map(celda => $(celda).attr('data-value'));
+            
+            
+            for (let i = valores.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [valores[i], valores[j]] = [valores[j], valores[i]];
+            }
+            
+            
+            celdas.forEach((celda, index) => {
+                const valor = valores[index];
+                $(celda).attr('data-value', valor);
+                
+                const num = parseInt(valor) - 1;
+                const row = Math.floor(num / 3);
+                const col = num % 3;
+                
+                const imagenUrl = $('.puzzle-cell').css('background-image').replace('url("', '').replace('")', '');
+                $(celda).css({
+                    'background-image': 'url(' + imagenUrl + ')'
+                });
+            });
+            
+            
+            if (verificarSolucion()) {
+                
+                setTimeout(barajarPiezas, 100);
+            }
+        }
+        
+        
+        function onPuzzleDragStart(e) {
+            
+            const event = e.originalEvent || e;
+            const $pieza = $(this);
+            
+            
+            if (!$pieza.hasClass('puzzle-piece')) {
+                event.preventDefault();
+                return false;
+            }
+            
+            
+            const row = $pieza.data('row');
+            const col = $pieza.data('col');
+            const bgImage = $pieza.css('background-image');
+            const bgPosition = $pieza.css('background-position');
+            const bgSize = $pieza.css('background-size');
+            
+            
+            const dragData = {
+                row: row,
+                col: col,
+                bgImage: bgImage,
+                bgPosition: bgPosition,
+                bgSize: bgSize,
+                isPiece: true
+            };
+            
+            
+            const dataString = JSON.stringify(dragData);
+            
+            try {
+                
+                if (event.dataTransfer) {
+                    event.dataTransfer.effectAllowed = 'copyMove';
+                    event.dataTransfer.dropEffect = 'move';
+                    
+                    event.dataTransfer.setData('text/plain', dataString);
+                    event.dataTransfer.setData('application/json', dataString);
+                    
+                    
+                    $pieza.addClass('dragging');
+                    
+                    
+                    setTimeout(() => {
+                        $pieza.addClass('hide-while-dragging');
+                    }, 0);
+                    
+                    console.log('Iniciando arrastre de pieza:', dragData);
+                    return true;
+                } else {
+                    console.error('dataTransfer no está disponible en el evento');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error en onPuzzleDragStart:', error);
+                return false;
+            }
+        }
+        
+        function onPuzzleDragOver(e) {
+            
+            const event = e.originalEvent || e;
+            
+            
+            event.preventDefault();
+            event.stopPropagation();
+            
+            try {
+                
+                const $target = $(event.target).closest('.puzzle-cell');
+                
+                if ($target.length && $target.hasClass('empty')) {
+                    
+                    if (event.dataTransfer) {
+                        event.dataTransfer.dropEffect = 'move';
+                    }
+                    $target.addClass('drag-over');
+                } else {
+                    if (event.dataTransfer) {
+                        event.dataTransfer.dropEffect = 'none';
+                    }
+                }
+                
+                return false;
+            } catch (error) {
+                console.error('Error en onPuzzleDragOver:', error);
+                return false;
+            }
+        }
+        
+        function onDragLeave(e) {
+            $(e.target).removeClass('drag-over');
+        }
+        
+        function onPuzzleDragEnd(e) {
+            
+            $('.puzzle-piece').removeClass('dragging hide-while-dragging');
+            $('.puzzle-cell').removeClass('drag-over');
+            
+            
+            document.body.style.cursor = 'default';
+            
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            return false;
+        }
+        
+        function onPuzzleDrop(e) {
+            
+            const event = e.originalEvent || e;
+            
+            
+            event.preventDefault();
+            event.stopPropagation();
+            
+            try {
+                
+                const $target = $(event.target).closest('.puzzle-cell');
+                if (!$target.length || !$target.hasClass('empty')) {
+                    console.log('No se puede soltar aquí: celda no válida o no vacía');
+                    return false;
+                }
+                
+                
+                $('.puzzle-cell').removeClass('drag-over');
+                
+                
+                const $source = $('.puzzle-piece.dragging').first();
+                if (!$source.length) {
+                    console.error('No se encontró la pieza que se está arrastrando');
+                    return false;
+                }
+                
+                
+                let data;
+                const dataTransfer = event.dataTransfer;
+                
+                if (!dataTransfer) {
+                    console.error('No se pudo acceder a dataTransfer');
+                    return false;
+                }
+                
+                
+                try {
+                    
+                    data = dataTransfer.getData('application/json');
+                    
+                    
+                    if (!data) {
+                        data = dataTransfer.getData('text/plain');
+                    }
+                    
+                    
+                    if (!data && dataTransfer.types && dataTransfer.types.length > 0) {
+                        const firstType = dataTransfer.types[0];
+                        data = dataTransfer.getData(firstType);
+                    }
+                    
+                    if (!data) {
+                        console.error('No se encontraron datos de arrastre');
+                        return false;
+                    }
+                    
+                    console.log('Datos de arrastre recibidos:', data);
+                } catch (error) {
+                    console.error('Error al obtener los datos de arrastre:', error);
+                    return false;
+                }
+                
+                
+                let sourceData;
+                try {
+                    
+                    if (typeof data === 'string' && (data.startsWith('{') || data.startsWith('['))) {
+                        sourceData = JSON.parse(data);
+                    } else if (typeof data === 'object') {
+                        
+                        sourceData = data;
+                    } else {
+                        console.error('Formato de datos no válido:', data);
+                        return false;
+                    }
+                    
+                    
+                    if (!sourceData || !sourceData.isPiece || 
+                        typeof sourceData.row === 'undefined' || 
+                        typeof sourceData.col === 'undefined') {
+                        console.error('Datos de arrastre incompletos:', sourceData);
+                        return false;
+                    }
+                    
+                    console.log('Datos de pieza procesados:', sourceData);
+                    
+                    
+                    const targetRow = parseInt($target.data('row'));
+                    const targetCol = parseInt($target.data('col'));
+                    
+                    
+                    const pieceRow = parseInt(sourceData.row);
+                    const pieceCol = parseInt(sourceData.col);
+                    
+                    console.log('Soltando pieza en celda:', {
+                        target: { row: targetRow, col: targetCol },
+                        piece: { row: pieceRow, col: pieceCol }
+                    });
+                    
+                    
+                    if (targetRow === pieceRow && targetCol === pieceCol) {
+                        
+                        const $nuevaPieza = $('<div class="puzzle-piece-placed"></div>')
+                            .css({
+                                'position': 'absolute',
+                                'top': '0',
+                                'left': '0',
+                                'width': '100%',
+                                'height': '100%',
+                                'background-image': sourceData.bgImage,
+                                'background-position': sourceData.bgPosition,
+                                'background-size': sourceData.bgSize,
+                                'background-repeat': 'no-repeat',
+                                'z-index': '1',
+                                'pointer-events': 'none'
+                            })
+                            .attr({
+                                'data-row': sourceData.row,
+                                'data-col': sourceData.col,
+                                'draggable': 'false'
+                            });
+                        
+                        
+                        $target
+                            .empty()
+                            .removeClass('empty')
+                            .addClass('occupied correct')
+                            .attr({
+                                'data-row': sourceData.row,
+                                'data-col': sourceData.col
+                            })
+                            .append($nuevaPieza);
+                        
+                        
+                        $source.remove();
+                        
+                        
+                    } else {
+                        
+                        $source.removeClass('dragging hide-while-dragging');
+                        return false;
+                    }
+                    
+                    
+                    const piezasColocadas = $('.puzzle-piece-placed').length;
+                    const totalPiezas = 8; 
+                    
+                    
+                    
+                } catch (error) {
+                    console.error('Error al analizar los datos de arrastre:', error, 'Datos:', data);
+                    return false;
+                }
+                
+                return false;
+                
+            } catch (error) {
+                console.error('Error en onPuzzleDrop:', error);
+                return false;
+            }
+        }
+        
+        function onPuzzleDragEnd() {
+            this.classList.remove('dragging');
+        }
+        
+        
+        function mostrarRetroalimentacion(esCorrecto, mensaje) {
+            const $feedback = $('#feedback');
+            let icono = esCorrecto ? 'fa-check-circle' : 'fa-times-circle';
+            let clase = esCorrecto ? 'alert-success' : 'alert-danger';
+            
+            $feedback.html(`
+                <div class="alert ${clase} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icono} me-2"></i>${mensaje}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            `);
+        }
+        
+        
+        function marcarComoCompletada() {
+            console.log('Función marcarComoCompletada llamada');
+            
+            
+            const $celdas = $('.puzzle-cell:not(.empty)');
+            let todasCorrectas = true;
+            console.log('Verificando solución...');
+            
+            $celdas.each(function() {
+                const $celda = $(this);
+                const $pieza = $celda.find('.puzzle-piece-placed');
+                
+                if ($pieza.length) {
+                    const row = parseInt($pieza.data('row'));
+                    const col = parseInt($pieza.data('col'));
+                    const celdaRow = parseInt($celda.data('row'));
+                    const celdaCol = parseInt($celda.data('col'));
+                    
+                    if (row !== celdaRow || col !== celdaCol) {
+                        todasCorrectas = false;
+                        return false; 
+                    }
+                } else {
+                    todasCorrectas = false;
+                    return false; 
+                }
+            });
+            
+            
+            const actividadId = /*[[${actividad.id}]]*/ 0;
+            const moduloId = /*[[${moduloId}]]*/ 0;
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+            
+            if (!todasCorrectas) {
+                
+                console.log('Solución incorrecta, registrando intento fallido...');
+                
+                
+                mostrarMensaje('error', 'La solución no es correcta. Por favor, verifica las piezas.');
+                
+                
+                $.ajax({
+                    url: '/api/activity-response/' + actividadId + '/submit?isCorrect=false',
+                    type: 'POST',
+                    contentType: 'application/x-www-form-urlencoded',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    success: function(response) {
+                        console.log('Intento fallido registrado:', response);
+                        if (response.success) {
+                            mostrarMensaje('error', 'Respuesta incorrecta. Sigue intentando.');
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error al registrar intento fallido:', error);
+                    }
+                });
+                
+                return;
+            }
+            
+            
+            console.log('Solución correcta, registrando en el servidor...');
+            
+            
+            mostrarMensaje('info', 'Verificando tu solución...');
+            
+            
+            $.ajax({
+                url: '/api/activity-response/' + actividadId + '/submit?isCorrect=true',
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+                success: function(response) {
+                    console.log('Respuesta del servidor:', response);
+                    if (response.success) {
+                        
+                        mostrarMensaje('success', response.message || '¡Solución correcta! Has ganado 5 puntos.');
+                        
+                        if (response.moduloCompletado) {
+                            mostrarBotonSiguienteActividad(actividadId, moduloId);
+                        }
+                    } else {
+                        console.error('No se pudo registrar la solución:', response);
+                        mostrarMensaje('warning', response.message || 'No se pudo registrar tu solución.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al registrar la solución:', error);
+                    let errorMessage = 'Error al verificar tu solución. Por favor, inténtalo de nuevo.';
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse.message) {
+                            errorMessage = errorResponse.message;
+                        }
+                    } catch (e) {
+                        console.error('Error al parsear respuesta de error:', e);
+                    }
+                    mostrarMensaje('error', errorMessage);
+                }
+            });
+        }
+        
+        
+        function mostrarBotonSiguienteActividad(actividadId, moduloId) {
+            console.log('mostrarBotonSiguienteActividad llamado con:', {actividadId, moduloId});
+            
+            
+            const urlSiguiente = '/actividad/' + actividadId + '/siguiente?moduloId=' + moduloId;
+            console.log('Redirigiendo a:', urlSiguiente);
+            
+            
+            const $btnSiguiente = $('#btnSiguienteActividad')
+                .attr('href', urlSiguiente)
+                .html('<i class="fas fa-arrow-right me-2"></i>Siguiente Actividad')
+                .removeClass('btn-outline-primary')
+                .addClass('btn-success');
+                
+            
+            const $container = $('#siguienteActividadContainer');
+            if ($container.length) {
+                $('html, body').animate({
+                    scrollTop: $container.offset().top - 100
+                }, 1000);
+            }
+        }
+        
+        /*]]>*/
+    </script>
+</body>
+</html>

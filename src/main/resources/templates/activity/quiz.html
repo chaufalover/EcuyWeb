@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Quiz: ' + ${actividad.titulo}">Actividad de Quiz</title>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .activity-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .quiz-image-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .quiz-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+        .options-container {
+            margin-top: 1.5rem;
+        }
+        .option {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        .option.selected {
+            background-color: #e2f0fd;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            transform: translateY(-2px);
+        }
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .option .option-letter {
+            background-color: #6c757d;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+        .option.correct .option-letter {
+            background-color: #28a745;
+        }
+        .option.incorrect .option-letter {
+            background-color: #dc3545;
+        }
+        
+        .option.clicked {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+        .feedback-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+        .feedback-correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback-incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .next-activity-container {
+            text-align: center;
+            margin: 2.5rem auto 1rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+            border: 1px dashed #dee2e6;
+            max-width: 600px;
+        }
+        
+        .next-activity-container p {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .btn-next-activity {
+            font-size: 1.1rem;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(25, 135, 84, 0.2);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-next-activity:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 135, 84, 0.3);
+        }
+        
+        .btn-next-activity:active {
+            transform: translateY(0);
+        }
+        
+        .btn-next-activity i {
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-next-activity:hover i {
+            transform: translateX(3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a th:href="@{/modulo/__${moduloId}__}" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left me-2"></i> Volver al módulo
+        </a>
+        
+        <div class="activity-container">
+            <h2 class="mb-4" th:text="${actividad.titulo}">Título del Quiz</h2>
+            
+            
+            <div class="quiz-image-container">
+                <img th:if="${actividad.urlImagen}" 
+                     th:src="${actividad.urlImagen}" 
+                     alt="Imagen de la pregunta" 
+                     class="quiz-image img-fluid">
+            </div>
+            
+            
+            <div class="question-text" th:text="${actividad.descripcion}">
+                ¿Cuál es la respuesta correcta a esta pregunta de ejemplo?
+            </div>
+            
+            
+            <div class="options-container">
+                <div th:each="opcion, stat : ${actividad.opciones}" 
+                     class="option" 
+                     th:data-correct="${opcion.esCorrecta}"
+                     th:data-option-id="${opcion.id}">
+                    <div class="option-letter" th:text="${#strings.toUpperCase(#strings.substring('abcd', stat.index, stat.index + 1))}">A</div>
+                    <div class="option-text" th:text="${opcion.texto}">Opción de ejemplo</div>
+                </div>
+            </div>
+            
+            
+            <div id="feedback" class="feedback-message">
+                <i class="fas me-2"></i>
+                <span id="feedback-text"></span>
+            </div>
+            
+            
+            <div class="d-flex justify-content-between mt-4">
+                <div>
+                    <a th:if="${actividadAnteriorId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadAnteriorId})}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Anterior
+                    </a>
+                </div>
+                <div>
+                    <button id="btnCheck" class="btn btn-primary me-2" onclick="verificarRespuesta()">
+                        <i class="fas fa-check-circle me-2"></i>Verificar
+                    </button>
+                    <a id="btnNextActivity" 
+                       th:if="${actividadSiguienteId != null}" 
+                       th:href="@{/actividad/{id}(id=${actividadSiguienteId})}" 
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>Siguiente Actividad
+                    </a>
+                    <a th:if="${actividadSiguienteId == null}" 
+                       th:href="@{/modulo/__${moduloId}__}" 
+                       class="btn btn-success"
+                       id="btnBackToModule">
+                        <i class="fas fa-check-circle me-2"></i>¡Completado! Volver al módulo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+        
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            
+            
+            function inicializarQuiz() {
+                
+                $('.option').on('click', function() {
+                    
+                    if ($(this).hasClass('selected')) {
+                        return;
+                    }
+                    
+                    
+                    $('.option').removeClass('selected');
+                    
+                    
+                    $(this).addClass('selected');
+                    
+                    
+                    $(this).addClass('clicked');
+                    setTimeout(() => {
+                        $(this).removeClass('clicked');
+                    }, 300);
+                    
+                    
+                    $('#feedback').hide();
+                });
+            }
+            
+            
+            $(document).ready(function() {
+                inicializarQuiz();
+            });
+        
+        
+        function verificarRespuesta() {
+            const $opcionSeleccionada = $('.option.selected');
+            
+            if ($opcionSeleccionada.length === 0) {
+                mostrarMensaje('warning', 'Por favor selecciona una opción.');
+                return;
+            }
+            
+            
+            const esCorrecta = $opcionSeleccionada.attr('data-correct') === 'true';
+            const $feedback = $('#feedback');
+            const $feedbackText = $('#feedback-text');
+            
+            
+            
+            $opcionSeleccionada.removeClass('correct incorrect');
+            
+            if (esCorrecta) {
+                
+                $opcionSeleccionada.addClass('correct');
+                
+                
+                $feedback.removeClass('feedback-incorrect').addClass('feedback-correct').show();
+                $feedback.find('i').removeClass().addClass('fas fa-check-circle me-2');
+                $feedbackText.text('¡Correcto! Has seleccionado la respuesta correcta.');
+                
+                
+                $opcionSeleccionada.css({
+                    'background-color': '#d4edda',
+                    'border-color': '#c3e6cb',
+                    'color': '#155724'
+                });
+                
+                
+                $opcionSeleccionada.find('.option-letter').css({
+                    'background-color': '#28a745',
+                    'color': 'white'
+                });
+            } else {
+                
+                $opcionSeleccionada.addClass('incorrect');
+                
+                
+                $feedback.removeClass('feedback-correct').addClass('feedback-incorrect').show();
+                $feedback.find('i').removeClass().addClass('fas fa-times-circle me-2');
+                $feedbackText.text('Incorrecto. Inténtalo de nuevo.');
+                
+                
+                $opcionSeleccionada.css({
+                    'background-color': '#f8d7da',
+                    'border-color': '#f5c6cb',
+                    'color': '#721c24'
+                });
+                
+                
+                $opcionSeleccionada.find('.option-letter').css({
+                    'background-color': '#dc3545',
+                    'color': 'white'
+                });
+            }
+            
+            
+            marcarComoCompletada();
+        }
+        
+        
+        function marcarComoCompletada() {
+            console.log('=== INICIO marcarComoCompletada ===');
+            const actividadId = /*[[${actividad.id}]]*/ 0;
+            const moduloId = /*[[${moduloId}]]*/ 0;
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+            
+            console.log('Actividad ID:', actividadId, 'Módulo ID:', moduloId);
+            console.log('CSRF Token:', csrfToken ? 'Presente' : 'Ausente');
+            
+            
+            const $opcionSeleccionada = $('.option.selected');
+            if ($opcionSeleccionada.length === 0) {
+                console.log('No hay opción seleccionada');
+                mostrarMensaje('warning', 'Por favor selecciona una opción.');
+                return;
+            }
+            
+            console.log('Opción seleccionada:', $opcionSeleccionada);
+            console.log('Atributos de la opción:', {
+                'data-correct': $opcionSeleccionada.attr('data-correct'),
+                'data-option-id': $opcionSeleccionada.attr('data-option-id'),
+                'class': $opcionSeleccionada.attr('class')
+            });
+            
+            
+            const esCorrecta = $opcionSeleccionada.attr('data-correct') === 'true';
+            console.log('¿Es correcta la respuesta?', esCorrecta);
+            
+            
+            mostrarMensaje('info', 'Verificando tu respuesta...');
+            console.log('Mostrando mensaje de carga...');
+            
+            
+            const requestData = { isCorrect: esCorrecta };
+            console.log('Enviando solicitud al servidor:', {
+                url: '/api/activity-response/' + actividadId + '/submit',
+                data: requestData,
+                headers: {
+                    [csrfHeader]: csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            
+            $.ajax({
+                url: '/api/activity-response/' + actividadId + '/submit?isCorrect=' + esCorrecta,
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+                success: function(response, status, xhr) {
+                    console.log('Respuesta del servidor (cruda):', response);
+                    console.log('Tipo de respuesta:', typeof response);
+                    
+                    
+                    let responseData = response;
+                    if (typeof response === 'string') {
+                        try {
+                            responseData = JSON.parse(response);
+                        } catch (e) {
+                            console.error('Error al parsear la respuesta JSON:', e);
+                            mostrarMensaje('error', 'Error al procesar la respuesta del servidor.');
+                            return;
+                        }
+                    }
+                    
+                    console.log('Respuesta procesada:', responseData);
+                    
+                    if (responseData.success) {
+                        console.log('Respuesta correcta - Mensaje:', responseData.message);
+                        $opcionSeleccionada.addClass('correct');
+                        mostrarMensaje('success', responseData.message || '¡Respuesta correcta!');
+                        
+                        
+                        if (responseData.moduloCompletado) {
+                            console.log('Módulo completado, mostrando botón de siguiente actividad');
+                            mostrarBotonSiguienteActividad(actividadId, moduloId);
+                        }
+                    } else {
+                        console.log('Respuesta incorrecta - Mensaje:', responseData.message);
+                        $opcionSeleccionada.addClass('incorrect');
+                        mostrarMensaje('error', responseData.message || 'Respuesta incorrecta. Intenta de nuevo.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', {
+                        status: status,
+                        error: error,
+                        responseText: xhr.responseText,
+                        statusCode: xhr.status,
+                        statusText: xhr.statusText,
+                        responseHeaders: xhr.getAllResponseHeaders()
+                    });
+                    
+                    let errorMessage = 'Error al verificar tu respuesta. Por favor, inténtalo de nuevo.';
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse.message) {
+                            errorMessage = errorResponse.message;
+                        }
+                    } catch (e) {
+                        console.error('Error al parsear respuesta de error:', e);
+                    }
+                    mostrarMensaje('error', errorMessage);
+                }
+            });
+        }
+        
+        
+        const actividadId = /*[[${actividad.id}]]*/ 'undefined';
+        const moduloId = /*[[${moduloId}]]*/ 'undefined';
+        
+        
+        function irASiguienteActividad() {
+            console.log('ID de actividad:', actividadId);
+            console.log('ID de módulo:', moduloId);
+            
+            if (actividadId === 'undefined' || isNaN(parseInt(actividadId))) {
+                console.error('No se pudo obtener el ID de la actividad actual o no es válido');
+                mostrarMensaje('error', 'Error: No se pudo cargar la siguiente actividad');
+                return;
+            }
+            
+            
+            const btn = $('#btnSiguienteActividad');
+            const originalText = btn.html();
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
+            
+            try {
+                
+                let url = '/api/actividad/siguiente/' + actividadId;
+                
+                
+                if (moduloId && moduloId !== 'undefined' && !isNaN(parseInt(moduloId))) {
+                    url += '?moduloId=' + moduloId;
+                }
+                
+                console.log('Navegando a:', url);
+                window.location.href = url;
+            } catch (error) {
+                console.error('Error al construir la URL:', error);
+                btn.html(originalText).prop('disabled', false);
+                mostrarMensaje('error', 'Error al preparar la navegación');
+            }
+        }
+        
+        
+        $(document).on('click', '#btnSiguienteActividad', function(e) {
+            e.preventDefault();
+            irASiguienteActividad();
+        });
+        
+        
+        function mostrarMensaje(tipo, mensaje, duracion = 5000) {
+            const $toast = $(`
+                <div class="toast align-items-center text-white bg-${tipo} border-0 position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                            ${mensaje}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+                    </div>
+                </div>
+            `);
+            
+            $('body').append($toast);
+            const toast = new bootstrap.Toast($toast[0], { autohide: true, delay: duracion });
+            toast.show();
+            
+            $toast.on('hidden.bs.toast', function() {
+                $toast.remove();
+            });
+        }
+        
+        /*]]>*/
+    </script>
+</body>
+</html>

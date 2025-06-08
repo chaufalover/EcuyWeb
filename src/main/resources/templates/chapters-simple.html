@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Módulo - ' + ${modulo.nombre} + ' - Ecuy'">Módulo - Ecuy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #27ae60;
+            --text-light: #ecf0f1;
+            --text-dark: #2c3e50;
+            --bg-light: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e6fad7;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #79845B;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1000;
+            width: 100%;
+        }
+        
+        .menu-section {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .menu-btn {
+            background: none;
+            border: 2px solid white;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            height: 36px;
+            width: 44px;
+            background: transparent;
+        }
+        
+        .menu-btn span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .user-avatar {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .user-avatar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            min-width: 180px;
+            z-index: 1001;
+            overflow: hidden;
+            padding: 8px 0;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: var(--accent-color);
+        }
+        
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            margin: 0 auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .main-content {
+            padding: 30px 0;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-header i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        
+        .activity-card {
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .activity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #4a90e2, #6a5acd);
+        }
+        
+        .activity-card:nth-child(odd)::before {
+            background: linear-gradient(to bottom, #4a90e2, #6a5acd);
+        }
+        
+        .activity-card:nth-child(even)::before {
+            background: linear-gradient(to bottom, #ff6b6b, #ff8e8e);
+        }
+        
+        .activity-card:nth-child(3n)::before {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+        }
+        
+        .activity-card:nth-child(4n)::before {
+            background: linear-gradient(to bottom, #f39c12, #f1c40f);
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        
+        .activity-card .d-flex {
+            padding: 15px 20px 15px 24px;
+        }
+        
+        .activity-icon {
+            font-size: 1.4em;
+            margin-right: 15px;
+            background: linear-gradient(135deg, #4a90e2, #6a5acd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .activity-card:nth-child(odd) .activity-icon {
+            background: linear-gradient(135deg, #4a90e2, #6a5acd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .activity-card:nth-child(even) .activity-icon {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .activity-card:nth-child(3n) .activity-icon {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .activity-card:nth-child(4n) .activity-icon {
+            background: linear-gradient(135deg, #f39c12, #f1c40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <nav class="top-nav">
+            <div class="menu-section">
+                <button class="menu-btn" onclick="window.location.href='/modulos'">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="user-section">
+                <div class="user-avatar" id="profileDropdown">
+                    <img src="/img/perfil.PNG" alt="Avatar de usuario" 
+                         th:if="${#authentication?.isAuthenticated()}"
+                         th:src="${#authentication?.principal?.avatarUrl != null} ? ${#authentication.principal.avatarUrl} : '/img/perfil.PNG'" 
+                         onerror="this.src='/img/perfil.PNG'">
+                    <img src="/img/perfil.PNG" alt="Avatar por defecto" 
+                         th:unless="${#authentication?.isAuthenticated()}"
+                         onerror="this.src='/img/perfil.PNG'">
+                    <div class="dropdown-menu" id="profileMenu">
+                        <a href="/perfil" class="dropdown-item">
+                            <i class="fas fa-user"></i> Ver perfil
+                        </a>
+                        <a href="#" class="dropdown-item" th:href="@{/logout}">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        
+        <div class="main-content">
+            <div class="container mt-4">
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h1 class="h2 mb-3" th:text="${modulo.nombre}">Nombre del Módulo</h1>
+                        <p class="lead" th:if="${modulo.descripcion}" th:text="${modulo.descripcion}">
+                            Descripción del módulo
+                        </p>
+                    </div>
+                </div>
+
+                
+                <div th:if="${sinActividades}" class="alert alert-info">
+                    <h4 class="alert-heading">¡Módulo en construcción!</h4>
+                    <p>Este módulo aún no tiene actividades disponibles. Estamos trabajando en agregar contenido pronto.</p>
+                    <hr>
+                    <p class="mb-0">Por favor, vuelve más tarde o contacta al administrador para más información.</p>
+                </div>
+                
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Información del Módulo
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${modulo.descripcion}" class="mb-3">
+                            <h5>Descripción:</h5>
+                            <p class="text-muted" th:text="${modulo.descripcion}"></p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Progreso del Módulo</h5>
+                                <div class="progress mb-3" style="height: 20px;">
+                                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
+                                         role="progressbar" 
+                                         th:style="'width: ' + ${porcentajeProgreso} + '%;'"
+                                         th:aria-valuenow="${porcentajeProgreso}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100"
+                                         th:classappend="${moduloCompletado} ? 'bg-success' : 'bg-primary'">
+                                        <span th:text="${porcentajeProgreso} + '%'"></span>
+                                    </div>
+                                </div>
+                                <p class="text-muted" th:if="${puntuacion} > 0">
+                                    Puntuación: <span th:text="${puntuacion} + ' de 20 puntos'"></span>
+                                    <span th:if="${moduloCompletado}" class="badge bg-success ms-2">¡Completado!</span>
+                                </p>
+                                <p class="text-muted" th:unless="${puntuacion} > 0">
+                                    Aún no has completado ninguna actividad de este módulo.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-tasks me-2"></i>
+                        Actividades del Módulo
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            
+                            <div th:each="actividad, stat : ${actividades}" 
+                                 class="list-group-item list-group-item-action flex-column align-items-start mb-2 activity-card"
+                                 style="cursor: pointer;"
+                                 th:onclick="'cargarActividad(' + ${actividad.id} + ')'">
+                                <div class="d-flex w-100">
+                                    <h5 class="mb-1 w-100">
+                                        <i th:class="${'fas ' + 
+                                            (actividad.tipoActividad == 'LECTURA' ? 'fa-book' : 
+                                             actividad.tipoActividad == 'VIDEO' ? 'fa-video' : 'fa-tasks')} 
+                                            + ' activity-icon me-2'"></i>
+                                        <span th:text="'Actividad ' + ${stat.count} + ': ' + ${actividad.titulo}">Actividad</span>
+                                    </h5>
+                                </div>
+                                <p class="mb-1" th:if="${actividad.descripcion}" th:text="${actividad.descripcion}"></p>
+                                <div class="d-flex">
+                                    <small class="text-muted">
+                                        <i class="fas fa-tag"></i> 
+                                        <span th:text="${actividad.tipoActividad}">Tipo de actividad</span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            
+                            <div th:if="${actividades == null or actividades.isEmpty()}" class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No hay actividades disponibles para este módulo.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileDropdown = document.getElementById('profileDropdown');
+            const profileMenu = document.getElementById('profileMenu');
+            
+            if (profileDropdown) {
+                profileDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileMenu.classList.toggle('show');
+                });
+            }
+            
+            
+            document.addEventListener('click', function(e) {
+                if (profileMenu && !profileDropdown.contains(e.target)) {
+                    profileMenu.classList.remove('show');
+                }
+            });
+            
+            
+            const menuBtn = document.getElementById('menuBtn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', function() {
+                
+                    console.log('Menú clickeado');
+                });
+            }
+        });
+    </script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+       
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        
+        function cargarActividad(actividadId) {
+            console.log("Cargando actividad con ID:", actividadId);
+            
+            window.location.href = '/actividad/' + actividadId;
+        }
+    </script>
+    
+    
+    <div class="modal fade" id="accessDeniedModal" tabindex="-1" aria-labelledby="accessDeniedModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white justify-content-center">
+                    <h5 class="modal-title" id="accessDeniedModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Acceso Denegado
+                    </h5>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <p class="lead mb-4" th:text="${error}">
+                        No tienes acceso a este módulo. Debes completar el módulo anterior con al menos 10 puntos.
+                    </p>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="window.location.href='/modulos'">
+                        <i class="fas fa-arrow-left me-2"></i>Volver a Módulos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script th:if="${showAccessDeniedModal}">
+        document.addEventListener('DOMContentLoaded', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('accessDeniedModal'));
+            myModal.show();
+        });
+    </script>
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
