@@ -527,9 +527,4 @@ public class NavigatorController {
         }
     }
 
-    @GetMapping("/profile")
-    public String profile(){
-        return "profile";
-    }
-
 }

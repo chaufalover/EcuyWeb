@@ -35,7 +35,7 @@ public class RegisterController {
     }
 
     @PostMapping
-    public String registrarCuenta(@ModelAttribute("usuario") @Valid RegisterRequest registroDTO, BindingResult result,
+    public String registrarCuenta(@Valid @ModelAttribute("usuario") RegisterRequest registroDTO, BindingResult result,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             return "register";
