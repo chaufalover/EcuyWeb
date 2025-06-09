@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
+    List<Activity> findByModuloId(Long moduloId);
     List<Activity> findByModuloIdOrderByOrdenAsc(Long moduloId);
     
     @Query("SELECT DISTINCT a FROM Activity a LEFT JOIN FETCH a.contenidos WHERE a.id = :id")

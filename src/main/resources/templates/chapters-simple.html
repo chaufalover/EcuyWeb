@@ -298,12 +298,7 @@
             </div>
             <div class="user-section">
                 <div class="user-avatar" id="profileDropdown">
-                    <img src="/img/perfil.PNG" alt="Avatar de usuario" 
-                         th:if="${#authentication?.isAuthenticated()}"
-                         th:src="${#authentication?.principal?.avatarUrl != null} ? ${#authentication.principal.avatarUrl} : '/img/perfil.PNG'" 
-                         onerror="this.src='/img/perfil.PNG'">
-                    <img src="/img/perfil.PNG" alt="Avatar por defecto" 
-                         th:unless="${#authentication?.isAuthenticated()}"
+                    <img src="/api/profile-image" alt="Avatar de usuario" id="userAvatar" class="profile-avatar"
                          onerror="this.src='/img/perfil.PNG'">
                     <div class="dropdown-menu" id="profileMenu">
                         <a href="/perfil" class="dropdown-item">
@@ -427,7 +422,7 @@
             const profileDropdown = document.getElementById('profileDropdown');
             const profileMenu = document.getElementById('profileMenu');
             
-            // Toggle dropdown menu
+            
             if (profileDropdown && profileMenu) {
                 profileDropdown.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -435,34 +430,34 @@
                 });
             }
             
-            // Close dropdown when clicking outside
+            
             document.addEventListener('click', function(e) {
                 if (profileMenu && profileDropdown && !profileDropdown.contains(e.target)) {
                     profileMenu.classList.remove('show');
                 }
             });
 
-            // Handle logout functionality
+            
             const logoutForm = document.getElementById('logoutForm');
             if (logoutForm) {
                 logoutForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     
-                    // Clear local storage
+                    
                     localStorage.removeItem('usuario');
                     localStorage.removeItem('token');
                     localStorage.removeItem('sesionIniciada');
 
-                    // Clear session storage
+                    
                     sessionStorage.clear();
 
 
-                    // Clear cookies
+                    
                     document.cookie.split(';').forEach(function(c) {
                         document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
                     });
 
-                    // Submit the form
+                    
                     this.submit();
                 });
             }
