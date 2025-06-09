@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,30 @@ public class User {
 
     @Column(name = "token_expiracion")
     private LocalDateTime tokenExpiration;
+
+    @Lob
+    @Column(name = "foto_perfil", columnDefinition = "LONGBLOB")
+    private byte[] fotoPerfil;
+
+    @Column(name = "tipo_imagen")
+    private String tipoImagen; 
+
+    
+    public byte[] getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(byte[] fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+
+    public String getTipoImagen() {
+        return tipoImagen;
+    }
+
+    public void setTipoImagen(String tipoImagen) {
+        this.tipoImagen = tipoImagen;
+    }
 
     public User(String nombre, String apellido, String correo, String password, String rol, String usuario) {
         this.nombre = nombre;

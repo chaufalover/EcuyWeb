@@ -19,6 +19,17 @@ public interface UserActivityProgressRepository extends JpaRepository<UserActivi
     Optional<UserActivityProgress> findByUserIdAndActivityId(@Param("userId") Integer userId, 
                                                            @Param("activityId") Long activityId);
     
+    List<UserActivityProgress> findByUser(User user);
+    
+    @Query("SELECT uap FROM UserActivityProgress uap WHERE uap.user = :user AND uap.completedAt IS NOT NULL")
+    List<UserActivityProgress> findCompletedByUser(@Param("user") User user);
+    
+    @Query("SELECT uap FROM UserActivityProgress uap WHERE uap.user = :user AND uap.activity IN :activities")
+    List<UserActivityProgress> findByUserAndActivityIn(
+        @Param("user") User user, 
+        @Param("activities") List<Activity> activities
+    );
+    
     @Query("SELECT uap FROM UserActivityProgress uap WHERE uap.user.id = :userId AND uap.activity.modulo.id = :moduleId")
     List<UserActivityProgress> findByUserIdAndModuleId(@Param("userId") Integer userId, 
                                                       @Param("moduleId") Long moduleId);
@@ -27,4 +38,8 @@ public interface UserActivityProgressRepository extends JpaRepository<UserActivi
           "WHERE uap.user.id = :userId AND uap.activity.modulo.id = :moduleId")
     Integer sumPuntosByUserIdAndModuleId(@Param("userId") Integer userId, 
                                         @Param("moduleId") Long moduleId);
+    
+    List<UserActivityProgress> findByCompletedAtIsNotNullOrderByCompletedAtDesc();
+    
+    List<UserActivityProgress> findByCompletedAtIsNotNull();
 }

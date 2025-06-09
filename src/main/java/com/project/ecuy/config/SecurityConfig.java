@@ -21,25 +21,55 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    private static final String[] WHITELIST = {
+        "/",
+        "/registro",
+        "/forgot-password",
+        "/reset-password",
+        "/error",
+        "/error/**",
+        "/css/**",
+        "/js/**",
+        "/img/**",
+        "/webjars/**",
+        "/favicon.ico"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors().and()
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/**") // Excluye rutas de API si es necesario
+                .ignoringRequestMatchers(
+                    "/api/**",
+                    "/h2-console/**"
+                )
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/registro", "/css/**", "/js/**", "/img/**", "/forgot-password", "/reset-password").permitAll()
+                .requestMatchers(WHITELIST).permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/modulo/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/modulos", true)
+                .successHandler((request, response, authentication) -> {
+                    
+                    boolean isAdmin = authentication.getAuthorities().stream()
+                            .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+                    if (isAdmin) {
+                        response.sendRedirect("/admin/dashboard");
+                    } else {
+                        response.sendRedirect("/modulos");
+                    }
+                })
                 .failureUrl("/?error=true")
                 .permitAll()
+            )
+            .exceptionHandling(exception -> exception
+                .accessDeniedPage("/error/403")
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
@@ -48,6 +78,9 @@ public class SecurityConfig {
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
+            )
+            .headers(headers -> headers
+                .frameOptions().sameOrigin()
             );
 
         return http.build();
