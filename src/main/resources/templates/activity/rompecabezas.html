@@ -389,7 +389,7 @@
         
         let currentPuzzle = [];
         let emptyPosition = { row: 2, col: 2 }; 
-        let totalPieces = 8; 
+        let totalPieces = 9; 
         let isCompleted = false;
         
         
@@ -569,7 +569,7 @@
             for (let i = 0; i < filas; i++) {
                 for (let j = 0; j < columnas; j++) {
                     
-                    if (i === filas - 1 && j === columnas - 1) continue;
+                    
                     
                     piezas.push({ row: i, col: j });
                 }
@@ -910,7 +910,7 @@
                     
                     
                     const piezasColocadas = $('.puzzle-piece-placed').length;
-                    const totalPiezas = 8; 
+                    const totalPiezas = totalPieces; 
                     
                     
                     
