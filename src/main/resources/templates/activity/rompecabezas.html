@@ -14,7 +14,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .activity-container {
-            max-width: 800px;
+            max-width: 1100px;
             margin: 2rem auto;
             padding: 2rem;
             background-color: white;
@@ -292,6 +292,24 @@
             margin-top: 15px;
             justify-content: center;
         }
+        .puzzle-layout {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .solved-image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .solved-image-container img {
+            max-width: 350px;
+            width: 100%;
+            border: 2px solid #333;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -310,8 +328,14 @@
                     </p>
                 </div>
                 
-                <div id="puzzleBoard" class="puzzle-board mb-4">
-                    
+                <div class="puzzle-layout">
+                    <div id="puzzleBoard" class="puzzle-board mb-4">
+                        
+                    </div>
+                    <div class="solved-image-container text-center">
+                        <img th:src="${actividad.urlImagenRompecabezas}" alt="Imagen guía del rompecabezas" class="img-fluid rounded shadow"/>
+                        <h4 class="mt-2">Imagen Guía</h4>
+                    </div>
                 </div>
                 
                 <div class="puzzle-pieces-container">
