@@ -126,31 +126,4 @@ public class AdminController {
         return "/admin/modules-admin";
     }
 
-    @GetMapping("/modulos/{id}/detalle")
-    public String detalleModulo(@PathVariable Long id, Model model) {
-        System.out.println("Obteniendo detalle del módulo con ID: " + id);
-
-        Module modulo = mservice.buscarPorId(id).orElseThrow();
-
-        List<Activity> actividades = activityService.obtenerActividadesCompletoPorModulo(id);
-
-        model.addAttribute("modulo", modulo);
-        model.addAttribute("actividades", actividades);
-
-        return "fragments/details-modules :: detalleModulo";
-    }
-
-    @PostMapping("/modulos/update")
-    public String actualizarModulo(@ModelAttribute("modulo") Module modulo) {
-        mservice.actualizarModuloCompleto(modulo);
-
-        return "redirect:/admin/modulos";
-    }
-
-    @PostMapping("/modulos/delete")
-    public String eliminarModulo(@RequestParam("moduloId") Long id) {
-        mservice.eliminarModuloConActividades(id);
-        return "redirect:/admin/modulos";
-    }
-
 }
