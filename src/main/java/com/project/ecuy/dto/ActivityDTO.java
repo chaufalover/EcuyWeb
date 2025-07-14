@@ -11,13 +11,21 @@ public class ActivityDTO {
     private String descripcion;
     private String tipoActividad;
     private Integer orden;
-    private String urlVideo; 
-    private String urlImagenRompecabezas; 
+    private String urlVideo;
+    private String urlImagenRompecabezas;
     private List<ActivityContentDTO> contenidos;
-    private List<QuizOptionDTO> opciones; 
-    private List<MatchingPairDTO> paresRelacionados; 
+    private List<QuizOptionDTO> opcionesQuiz;
+    private List<MatchingPairDTO> paresRelacionados;
+    private Integer puntos;
 
-    
+    public Integer getPuntos() {
+        return puntos;
+    }
+
+    public void setPuntos(Integer puntos) {
+        this.puntos = puntos;
+    }
+
     public Long getId() {
         return id;
     }
@@ -73,20 +81,19 @@ public class ActivityDTO {
     public void setContenidos(List<ActivityContentDTO> contenidos) {
         this.contenidos = contenidos;
     }
-    
+
     public List<QuizOptionDTO> getOpciones() {
-        return opciones;
+        return opcionesQuiz;
     }
 
     public void setOpciones(List<QuizOptionDTO> opciones) {
-        this.opciones = opciones;
+        this.opcionesQuiz = opciones;
     }
-    
-    
+
     public String getUrlImagen() {
         return this.urlImagenRompecabezas;
     }
-    
+
     public String getUrlImagenRompecabezas() {
         return urlImagenRompecabezas;
     }
@@ -94,7 +101,7 @@ public class ActivityDTO {
     public void setUrlImagenRompecabezas(String urlImagenRompecabezas) {
         this.urlImagenRompecabezas = urlImagenRompecabezas;
     }
-    
+
     public List<MatchingPairDTO> getParesRelacionados() {
         return paresRelacionados;
     }
@@ -104,75 +111,67 @@ public class ActivityDTO {
     }
 
     public static ActivityDTO fromEntity(Activity activity) {
-        if (activity == null) return null;
-        
+        if (activity == null)
+            return null;
+
         ActivityDTO dto = new ActivityDTO();
         dto.setId(activity.getId());
         dto.setTitulo(activity.getTitulo());
         dto.setDescripcion(activity.getDescripcion());
         dto.setTipoActividad(activity.getTipoActividad());
         dto.setOrden(activity.getOrden());
-        
-       
+        dto.setPuntos(activity.getPuntos());
+
         if (activity.getUrlVideo() != null && !activity.getUrlVideo().isEmpty()) {
-            
+
             if (activity.getUrlVideo().contains("youtube.com") || activity.getUrlVideo().contains("youtu.be")) {
                 String videoId = extractYoutubeId(activity.getUrlVideo());
                 dto.setUrlVideo(videoId);
             } else {
-                
+
                 dto.setUrlVideo(activity.getUrlVideo());
             }
         }
-        
-       
+
         dto.setUrlImagenRompecabezas(activity.getUrlImagenRompecabezas());
-        
-        
+
         if (activity.getContenidos() != null) {
-            dto.setContenidos(activity.getContenidos().stream()
-                .map(ActivityContentDTO::fromEntity)
-                .collect(Collectors.toList()));
+            dto.setContenidos(
+                    activity.getContenidos().stream().map(ActivityContentDTO::fromEntity).collect(Collectors.toList()));
         }
-        
-        
+
         if (activity.getParesRelacionados() != null && !activity.getParesRelacionados().isEmpty()) {
-            List<MatchingPairDTO> paresDTO = activity.getParesRelacionados().stream()
-                .map(MatchingPairDTO::fromEntity)
-                .collect(Collectors.toList());
+            List<MatchingPairDTO> paresDTO = activity.getParesRelacionados().stream().map(MatchingPairDTO::fromEntity)
+                    .collect(Collectors.toList());
             dto.setParesRelacionados(paresDTO);
         }
-        
-        
+
         if (activity.getOpcionesQuiz() != null && !activity.getOpcionesQuiz().isEmpty()) {
-            List<QuizOptionDTO> opcionesDTO = activity.getOpcionesQuiz().stream()
-                .map(opcion -> {
-                    QuizOptionDTO opcionDto = new QuizOptionDTO();
-                    opcionDto.setId(opcion.getId());
-                    opcionDto.setTexto(opcion.getTexto());
-                    opcionDto.setEsCorrecta(opcion.isEsCorrecta());
-                    return opcionDto;
-                })
-                .collect(Collectors.toList());
+            List<QuizOptionDTO> opcionesDTO = activity.getOpcionesQuiz().stream().map(opcion -> {
+                QuizOptionDTO opcionDto = new QuizOptionDTO();
+                opcionDto.setId(opcion.getId());
+                opcionDto.setTexto(opcion.getTexto());
+                opcionDto.setEsCorrecta(opcion.isEsCorrecta());
+                return opcionDto;
+            }).collect(Collectors.toList());
             dto.setOpciones(opcionesDTO);
         }
-        
+
         return dto;
     }
-    
-    
+
     private static String extractYoutubeId(String url) {
         String videoId = null;
-        
+
         String pattern = "(?<=watch\\?v=|/videos/|embed/|youtu.be/|/v/|/e/|watch\\?v%3D|%2Fvideos%2F|embed%2Fvideos%2F|watch\\?feature=player_embedded&v=|%2Fv%2F)[^#&?\\n]*";
-        
+
         java.util.regex.Pattern compiledPattern = java.util.regex.Pattern.compile(pattern);
         java.util.regex.Matcher matcher = compiledPattern.matcher(url);
-        
+
         if (matcher.find()) {
             videoId = matcher.group();
         }
-        
-        return videoId != null ? videoId : url; 
+
+        return videoId != null ? videoId : url;
     }
 }

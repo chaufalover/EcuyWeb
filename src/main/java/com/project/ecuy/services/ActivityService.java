@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +34,9 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
     private final UserProgressService userProgressService;
 
     @Autowired
-    public ActivityService(ActivityRepository repository, 
-                         ModuleRepository moduleRepository,
-                         UserActivityProgressRepository progressRepository,
-                         UserRepository userRepository,
-                         UserProgressService userProgressService) {
+    public ActivityService(ActivityRepository repository, ModuleRepository moduleRepository,
+            UserActivityProgressRepository progressRepository, UserRepository userRepository,
+            UserProgressService userProgressService) {
         super(repository);
         this.moduleRepository = moduleRepository;
         this.progressRepository = progressRepository;
@@ -50,8 +50,8 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
 
     /**
      * 
-     * @param currentActivityId 
-     * @return 
+     * @param currentActivityId
+     * @return
      */
     public List<Activity> obtenerSiguientesActividades(Long currentActivityId) {
         return repository.findSiguientesActividades(currentActivityId);
@@ -67,139 +67,129 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
     @Transactional
     public boolean marcarComoCompletada(Long actividadId, boolean isCorrect) {
         logger.info("=== INICIO marcarComoCompletada para actividadId: {} ===", actividadId);
-        
+
         try {
-            
+
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            logger.info("Contexto de seguridad obtenido. Autenticado: {}", 
-                (authentication != null && authentication.isAuthenticated()));
-                
-            if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            logger.info("Contexto de seguridad obtenido. Autenticado: {}",
+                    (authentication != null && authentication.isAuthenticated()));
+
+            if (authentication == null || !authentication.isAuthenticated()
+                    || authentication.getPrincipal().equals("anonymousUser")) {
                 logger.error("Usuario no autenticado o token inválido");
                 return false;
             }
-            
+
             String username = authentication.getName();
             logger.info("Buscando usuario: {}", username);
-            
-            
+
             Optional<User> userOpt = userRepository.findByUsuario(username);
             if (userOpt.isEmpty()) {
                 logger.error("Usuario no encontrado en la base de datos: {}", username);
                 return false;
             }
-            
+
             User user = userOpt.get();
             logger.info("Usuario encontrado - ID: {}, Nombre: {}", user.getId(), user.getUsuario());
-                
-            
+
             logger.info("Buscando actividad con ID: {}", actividadId);
             Optional<Activity> actividadOpt = repository.findById(actividadId);
             if (actividadOpt.isEmpty()) {
                 logger.error("Actividad no encontrada con ID: {}", actividadId);
                 return false;
             }
-            
+
             Activity actividad = actividadOpt.get();
-            logger.info("Actividad encontrada - ID: {}, Título: {}, Tipo: {}", 
-                actividad.getId(), actividad.getTitulo(), actividad.getTipoActividad());
-            
-            
+            logger.info("Actividad encontrada - ID: {}, Título: {}, Tipo: {}", actividad.getId(), actividad.getTitulo(),
+                    actividad.getTipoActividad());
+
             logger.info("Buscando progreso existente para usuario {} y actividad {}", user.getId(), actividadId);
-            Optional<UserActivityProgress> progresoExistente = progressRepository.findByUserAndActivity(user, actividad);
-            
-            
+            Optional<UserActivityProgress> progresoExistente = progressRepository.findByUserAndActivity(user,
+                    actividad);
+
             boolean otorgaPuntos = false;
             int puntos = 0;
-            
+
             if (actividad.getTipoActividad() != null) {
                 String tipoActividad = actividad.getTipoActividad().toUpperCase();
-                
-                if (tipoActividad.equals("VIDEO") || 
-                    tipoActividad.equals("ROMPECABEZAS") || 
-                    tipoActividad.equals("PUZZLE") || 
-                    tipoActividad.equals("QUIZ") || 
-                    tipoActividad.equals("CUESTIONARIO") || 
-                    tipoActividad.equals("RELACIONAR") || 
-                    tipoActividad.equals("EMPAREJAR") ||
-                    tipoActividad.equals("MATCHING")) {
-                    
-                    otorgaPuntos = isCorrect; 
-                    puntos = isCorrect ? 5 : 0; 
-                    
-                    logger.info("La actividad de tipo '{}' - Respuesta {}. Puntos a otorgar: {}", 
-                        tipoActividad, isCorrect ? "correcta" : "incorrecta", puntos);
+
+                if (tipoActividad.equals("VIDEO") || tipoActividad.equals("ROMPECABEZAS")
+                        || tipoActividad.equals("PUZZLE") || tipoActividad.equals("QUIZ")
+                        || tipoActividad.equals("CUESTIONARIO") || tipoActividad.equals("RELACIONAR")
+                        || tipoActividad.equals("EMPAREJAR") || tipoActividad.equals("MATCHING")) {
+
+                    otorgaPuntos = isCorrect;
+                    puntos = isCorrect ? 5 : 0;
+
+                    logger.info("La actividad de tipo '{}' - Respuesta {}. Puntos a otorgar: {}", tipoActividad,
+                            isCorrect ? "correcta" : "incorrecta", puntos);
                 } else {
                     logger.info("La actividad de tipo '{}' no otorga puntos", tipoActividad);
                 }
             } else {
                 logger.warn("Tipo de actividad no especificado, no se otorgarán puntos");
             }
-                
+
             if (progresoExistente.isPresent()) {
-                
+
                 UserActivityProgress progreso = progresoExistente.get();
                 logger.info("Progreso existente encontrado - ID: {}", progreso.getId());
-                
+
                 if (progreso.getCompletedAt() == null) {
                     progreso.setCompletedAt(LocalDateTime.now());
-                    
-                    
+
                     if (otorgaPuntos) {
                         progreso.setPuntosObtenidos(puntos);
                         progreso.setPuntosTotales(puntos);
                     }
-                    
+
                     logger.info("Actualizando progreso existente");
                     progressRepository.save(progreso);
                     logger.info("Actividad marcada como completada exitosamente (actualización)");
-                    
-                    
+
                     if (otorgaPuntos && actividad.getModulo() != null) {
                         try {
                             userProgressService.updateScore(user.getId(), actividad.getModulo().getId(), puntos);
-                            logger.info("Puntos actualizados para el módulo {} - Usuario: {}, Puntos: {}", 
-                                actividad.getModulo().getId(), user.getId(), puntos);
+                            logger.info("Puntos actualizados para el módulo {} - Usuario: {}, Puntos: {}",
+                                    actividad.getModulo().getId(), user.getId(), puntos);
                         } catch (Exception e) {
                             logger.error("Error al actualizar el progreso del módulo: {}", e.getMessage(), e);
                         }
                     }
-                    
+
                     return true;
                 } else {
                     logger.info("La actividad ya estaba marcada como completada anteriormente");
-                    return true; 
+                    return true;
                 }
             } else {
-                
+
                 logger.info("Creando nuevo progreso");
                 UserActivityProgress nuevoProgreso = new UserActivityProgress();
                 nuevoProgreso.setUser(user);
                 nuevoProgreso.setActivity(actividad);
                 nuevoProgreso.setStartedAt(LocalDateTime.now());
                 nuevoProgreso.setCompletedAt(LocalDateTime.now());
-                
-                
+
                 if (otorgaPuntos) {
                     nuevoProgreso.setPuntosObtenidos(puntos);
                     nuevoProgreso.setPuntosTotales(puntos);
                 }
-                
+
                 try {
                     UserActivityProgress progresoGuardado = progressRepository.save(nuevoProgreso);
                     logger.info("Nuevo progreso creado exitosamente - ID: {}", progresoGuardado.getId());
-                    
-                    
+
                     if (otorgaPuntos && actividad.getModulo() != null) {
                         try {
                             userProgressService.updateScore(user.getId(), actividad.getModulo().getId(), puntos);
-                            logger.info("Puntos actualizados para el módulo {} - Usuario: {}, Puntos: {}", 
-                                actividad.getModulo().getId(), user.getId(), puntos);
+                            logger.info("Puntos actualizados para el módulo {} - Usuario: {}, Puntos: {}",
+                                    actividad.getModulo().getId(), user.getId(), puntos);
                         } catch (Exception e) {
                             logger.error("Error al actualizar el progreso del módulo: {}", e.getMessage(), e);
                         }
                     }
-                    
+
                     return true;
                 } catch (Exception e) {
                     logger.error("Error al guardar el progreso: {}", e.getMessage(), e);
@@ -214,9 +204,9 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
 
     /**
      * 
-     * @param id 
-     * @return 
-     * @throws ResourceNotFoundException 
+     * @param id
+     * @return
+     * @throws ResourceNotFoundException
      */
     @Transactional(readOnly = true)
     public Activity getActivityWithContents(Long id) {
@@ -226,14 +216,14 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
 
     public Activity updateActivity(Long id, Activity activityDetails) {
         Activity activity = getById(id);
-        
+
         activity.setTitulo(activityDetails.getTitulo());
         activity.setDescripcion(activityDetails.getDescripcion());
         activity.setTipoActividad(activityDetails.getTipoActividad());
         activity.setOrden(activityDetails.getOrden());
         activity.setPuntos(activityDetails.getPuntos());
         activity.setActivo(activityDetails.isActivo());
-        
+
         return repository.save(activity);
     }
 
@@ -246,19 +236,19 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
         return repository.findByIdWithMatchingPairs(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with id: " + id));
     }
-    
+
     public Activity getActivityWithVideoWords(Long id) {
         return repository.findByIdWithVideoWords(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with id: " + id));
     }
-    
+
     public Activity getActivityWithOrderedVideoWords(Long id) {
         return repository.findByIdWithOrderedVideoWords(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with id: " + id));
     }
-    
+
     @Transactional
-    public void addVideoWordsToActivity(Long activityId, List<VideoWord> words) {
+    public void addVideoWordsToActivity(Long activityId, Set<VideoWord> words) {
         Activity activity = getById(activityId);
         for (VideoWord word : words) {
             word.setActividad(activity);
@@ -266,12 +256,12 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
         activity.getPalabrasVideo().addAll(words);
         repository.save(activity);
     }
-    
+
     /**
      * 
-     * @param activityId 
-     * @param imageUrl 
-     * @return 
+     * @param activityId
+     * @param imageUrl
+     * @return
      */
     @Transactional
     public Activity updatePuzzleConfig(Long activityId, String imageUrl) {
@@ -279,15 +269,30 @@ public class ActivityService extends BaseService<Activity, Long, ActivityReposit
         activity.setUrlImagenRompecabezas(imageUrl);
         return repository.save(activity);
     }
-    
+
     /**
      * 
-     * @param activityId 
-     * @return 
+     * @param activityId
+     * @return
      */
     @Transactional(readOnly = true)
     public Activity getPuzzleConfig(Long activityId) {
         return repository.findById(activityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with id: " + activityId));
+    }
+
+    @Transactional
+    public List<Activity> obtenerActividadesCompletoPorModulo(Long idModulo) {
+        List<Activity> actividades = repository.findByModuloId(idModulo);
+
+        // Accedemos forzadamente a cada relación para inicializarla (por lazy loading)
+        for (Activity a : actividades) {
+            a.getContenidos().size();
+            a.getOpcionesQuiz().size();
+            a.getParesRelacionados().size();
+            a.getPalabrasVideo().size();
+        }
+
+        return actividades;
     }
 }

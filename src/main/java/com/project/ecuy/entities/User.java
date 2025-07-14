@@ -2,8 +2,12 @@ package com.project.ecuy.entities;
 
 import java.time.LocalDateTime;
 
+import com.project.ecuy.util.RolEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,8 +39,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String usuario;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String rol;
+    private RolEnum rol;
 
     @Column(name = "reset_token")
     private String resetToken;
@@ -49,9 +54,8 @@ public class User {
     private byte[] fotoPerfil;
 
     @Column(name = "tipo_imagen")
-    private String tipoImagen; 
+    private String tipoImagen;
 
-    
     public byte[] getFotoPerfil() {
         return fotoPerfil;
     }
@@ -73,7 +77,7 @@ public class User {
         this.apellido = apellido;
         this.correo = correo;
         this.password = password;
-        this.rol = rol;
+        this.rol = RolEnum.USER;
         this.usuario = usuario;
 
     }

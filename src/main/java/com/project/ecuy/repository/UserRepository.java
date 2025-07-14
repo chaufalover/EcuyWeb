@@ -1,5 +1,6 @@
 package com.project.ecuy.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,19 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
      @Query("SELECT u FROM User u WHERE u.usuario = :usuario")
      User buscarUsuario(@Param("usuario") String usuario);
+
+     boolean existsByUsuario(String usuario);
+
+     boolean existsByCorreo(String correo);
+
+     @Query("select count(u) from User u")
+     int contador();
+
+      
+    @Query("SELECT u FROM User u WHERE " +
+           "LOWER(u.nombre) LIKE LOWER(CONCAT('%', :texto, '%')) OR " +
+           "LOWER(u.apellido) LIKE LOWER(CONCAT('%', :texto, '%')) OR " +
+           "LOWER(u.correo) LIKE LOWER(CONCAT('%', :texto, '%')) OR " +
+           "LOWER(u.usuario) LIKE LOWER(CONCAT('%', :texto, '%'))")
+    List<User> buscarUsuarios(@Param("texto") String texto);
 }

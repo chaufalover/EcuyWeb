@@ -1,8 +1,12 @@
 package com.project.ecuy.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,15 +15,23 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.project.ecuy.auth.CustomHandler;
+import com.project.ecuy.auth.CustomUserDetailService;
+
+import lombok.RequiredArgsConstructor;
+
 import java.util.Arrays;
 
 @Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final CustomUserDetailService service;
+
+    private final AppConfig config;
+    private final CustomHandler handler;
 
     private static final String[] WHITELIST = {
         "/",
@@ -36,9 +48,16 @@ public class SecurityConfig {
     };
 
     @Bean
+    DaoAuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(service);
+        provider.setPasswordEncoder(config.passwordEncoder());
+        return provider;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors().and()
+             .cors().and()
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
                     "/api/**",
@@ -48,28 +67,16 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(WHITELIST).permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/modulo/**").authenticated()
+                .requestMatchers("/admin/**", "/api/dashboard/**").hasAnyAuthority("ADMIN")
+                .requestMatchers("/modulo/**", "/api/encuestas").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/")
                 .loginProcessingUrl("/login")
-                .successHandler((request, response, authentication) -> {
-                    
-                    boolean isAdmin = authentication.getAuthorities().stream()
-                            .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
-                    if (isAdmin) {
-                        response.sendRedirect("/admin/dashboard");
-                    } else {
-                        response.sendRedirect("/modulos");
-                    }
-                })
+                .successHandler(handler)
                 .failureUrl("/?error=true")
                 .permitAll()
-            )
-            .exceptionHandling(exception -> exception
-                .accessDeniedPage("/error/403")
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")

@@ -1,11 +1,17 @@
 package com.project.ecuy;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import com.project.ecuy.entities.User;
+import com.project.ecuy.repository.UserRepository;
+import com.project.ecuy.util.RolEnum;
 
 import java.util.Scanner;
 
@@ -20,6 +26,26 @@ public class EcuyApplication {
         SpringApplication.run(EcuyApplication.class, args);
     }
     
+    @Bean
+	CommandLineRunner commandLineRunner(
+		UserRepository repository,
+		PasswordEncoder encoder
+	){
+		return args->{
+			if(repository.findByCorreo("admin@gmail.com").isEmpty()){
+				User usuario = new User();
+				usuario.setNombre("Super");
+                usuario.setApellido("Admin");
+				usuario.setCorreo("admin@gmail.com");
+                usuario.setFotoPerfil(null);
+				usuario.setPassword(encoder.encode("12345678"));
+				usuario.setUsuario("Admin123");
+				usuario.setRol(RolEnum.ADMIN);
+				repository.save(usuario);
+			}
+		};
+	}
+
     @Component
     public static class SightEngineInitializer implements ApplicationListener<ApplicationReadyEvent> {
         @Override

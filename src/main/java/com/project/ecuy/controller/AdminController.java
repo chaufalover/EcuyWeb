@@ -1,165 +1,156 @@
 package com.project.ecuy.controller;
 
+import com.project.ecuy.entities.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.ecuy.entities.Activity;
+import com.project.ecuy.entities.Module;
+import com.project.ecuy.entities.ModuleSurvey;
+import com.project.ecuy.services.ActivityService;
+import com.project.ecuy.services.ModuleService;
+import com.project.ecuy.services.ModuleSurveyService;
 import com.project.ecuy.services.StatsService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.project.ecuy.services.UserService;
+import lombok.RequiredArgsConstructor;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("admin")
+@RequiredArgsConstructor
 public class AdminController {
+    private final ModuleSurveyService surveyService;
+    private final UserService service;
+    private final ModuleService mservice;
+    private final ActivityService activityService;
 
     private final StatsService statsService;
 
-    @Autowired
-    public AdminController(StatsService statsService) {
-        this.statsService = statsService;
+    @GetMapping("usuarios")
+    public String listaUsuarios(@RequestParam(name = "busqueda", required = false) String busqueda, Model model)
+            throws JsonProcessingException {
+
+        List<User> usuarios = (busqueda != null && !busqueda.isBlank()) ? service.buscarUsuarios(busqueda)
+                : service.selectAll();
+
+        model.addAttribute("lista", usuarios);
+        model.addAttribute("usuario", new User());
+        model.addAttribute("totalUsers", usuarios.size());
+        model.addAttribute("param", busqueda);
+
+        Map<String, Object> dashboardStats = statsService.getDashboardStats();
+
+        model.addAttribute("usersByMonth", dashboardStats.get("usersByMonth"));
+        model.addAttribute("progressData", dashboardStats.get("progressData"));
+        model.addAttribute("progressByModule", dashboardStats.get("progressByModule"));
+        model.addAttribute("recentActivity", dashboardStats.get("recentActivity"));
+        model.addAttribute("totalUsers", dashboardStats.get("totalUsers"));
+
+        model.addAttribute("progresoUsuarios", dashboardStats.get("progressData"));
+        ObjectMapper mapper = new ObjectMapper();
+        String progresoUsuariosJson = mapper.writeValueAsString(dashboardStats.get("progressData"));
+        model.addAttribute("progresoUsuariosJson", progresoUsuariosJson);
+
+        return "/admin/report-user";
     }
 
-    private static final String DASHBOARD_VIEW = "admin/dashboard";
-    private static final String ERROR_LOADING_STATS = "No se pudieron cargar las estadísticas del dashboard";
-    
-    /**
-     * Maneja la solicitud GET para la página de dashboard del administrador.
-     * 
-     * @param model El modelo para pasar datos a la vista
-     * @return La vista del dashboard o redirección a página de error
-     */
-    @GetMapping(value = {"", "/", "/dashboard"})
-    @PreAuthorize("hasRole('ADMIN')")
-    public String dashboard(Model model) {
-        try {
-            Map<String, Object> stats = statsService.getDashboardStats();
-            
-            if (stats == null || stats.isEmpty()) {
-                throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR, 
-                    ERROR_LOADING_STATS
-                );
-            }
-            
-            addStatsToModel(model, stats);
-            return DASHBOARD_VIEW;
-            
-        } catch (ResponseStatusException rse) {
-            throw rse; 
-        } catch (Exception e) {
-            throw new ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR, 
-                "Error inesperado al cargar el dashboard: " + e.getMessage(), 
-                e
-            );
-        }
-    }
-    
-    /**
-     * Agrega las estadísticas al modelo de forma segura, manejando posibles valores nulos.
-     * 
-     * @param model El modelo al que se agregarán los atributos
-     * @param stats Mapa de estadísticas a agregar al modelo
-     */
-    private void addStatsToModel(Model model, Map<String, Object> stats) {
-        if (model == null || stats == null) {
-            throw new IllegalArgumentException("Modelo y estadísticas no pueden ser nulos");
-        }
-        
-        
-        safeAddAttribute(model, "usuariosPorMes", stats.get("usersByMonth"));
-        safeAddAttribute(model, "progresoUsuarios", stats.get("progressData"));
-        safeAddAttribute(model, "progresoPorModulo", stats.get("progressByModule"));
-        safeAddAttribute(model, "recentActivity", stats.get("recentActivity"));
-        
-        
-        handleUserStats(model, stats);
-        
-        
-        handleModuleList(model, stats);
-    }
-    
-    
-    private void handleUserStats(Model model, Map<String, Object> stats) {
-        Object totalUsers = stats.get("totalUsers");
-        int total = 0;
-        
-        if (totalUsers instanceof Number) {
-            total = ((Number) totalUsers).intValue();
-        }
-        
+    @GetMapping("dashboard")
+    public String dashboard(Model model) throws JsonProcessingException {
+        int total = service.totalUsuarios();
         model.addAttribute("totalUsers", total);
-    }
-    
-    
-    @SuppressWarnings("unchecked")
-    private void handleModuleList(Model model, Map<String, Object> stats) {
+        int totalm = mservice.totalModulos();
+        model.addAttribute("totalModules", totalm);
+        Map<String, Object> dashboardStats = statsService.getDashboardStats();
+
+        model.addAttribute("usersByMonth", dashboardStats.get("usersByMonth"));
+        model.addAttribute("progressData", dashboardStats.get("progressData"));
+        model.addAttribute("progressByModule", dashboardStats.get("progressByModule"));
+        model.addAttribute("recentActivity", dashboardStats.get("recentActivity"));
+        model.addAttribute("totalUsers", dashboardStats.get("totalUsers"));
+
+        model.addAttribute("progresoUsuarios", dashboardStats.get("progressData"));
+        ObjectMapper mapper = new ObjectMapper();
+        String progresoUsuariosJson = mapper.writeValueAsString(dashboardStats.get("progressData"));
+        model.addAttribute("progresoUsuariosJson", progresoUsuariosJson);
+
+        Long moduleId = 1L;
+        List<Object[]> resumen = surveyService.obtenerResumenPorCalificacion(moduleId);
+
+        Map<String, Long> encuestaData = new LinkedHashMap<>();
+        for (Object[] fila : resumen) {
+            String calificacion = String.valueOf(fila[0]);
+            Long cantidad = ((Number) fila[1]).longValue();
+            encuestaData.put(calificacion, cantidad);
+        }
+
         try {
-            Object progressByModule = stats.get("progressByModule");
-            List<Map<String, Object>> modulos = List.of();
-            
-            if (progressByModule instanceof Map) {
-                modulos = ((Map<String, Map<String, Object>>) progressByModule)
-                    .values().stream()
-                    .map(this::createModuleInfo)
-                    .sorted(Comparator.comparing(m -> ((Number) m.get("id")).longValue()))
-                    .collect(Collectors.toList());
-            }
-            
-            model.addAttribute("modulos", modulos);
-        } catch (Exception e) {
-            model.addAttribute("modulos", List.of());
-            
-            System.err.println("Error al procesar la lista de módulos: " + e.getMessage());
+            String json = new ObjectMapper().writeValueAsString(encuestaData);
+            model.addAttribute("encuestaDataJson", json);
+        } catch (JsonProcessingException e) {
+            model.addAttribute("encuestaDataJson", "{}");
         }
+
+        return "/admin/dashboard";
     }
-    
-    
-    private Map<String, Object> createModuleInfo(Map<String, Object> moduleData) {
-        Object id = moduleData.getOrDefault("id", 0);
-        String nombre = moduleData.getOrDefault("nombre", "Módulo sin nombre").toString();
-        
-        
-        String nombreLimpio = nombre;
-        String prefijoEsperado = "Módulo " + id;
-        
-        
-        if (nombre.startsWith(prefijoEsperado + ": ") || nombre.startsWith(prefijoEsperado + " - ") || 
-            nombre.startsWith(prefijoEsperado + ":") || nombre.startsWith(prefijoEsperado + "-")) {
-            nombreLimpio = nombre.substring(nombre.indexOf(" ", nombre.indexOf(prefijoEsperado) + prefijoEsperado.length())).trim();
+
+    @GetMapping("modulos")
+    public String modulos(Model model) {
+        List<Module> modulos = mservice.listarModulosActivos();
+        int totalm = modulos.size();
+        model.addAttribute("modulos", modulos);
+        model.addAttribute("totalModules", totalm);
+        Long moduleId = 1L;
+        List<Object[]> resumen = surveyService.obtenerResumenPorCalificacion(moduleId);
+
+        Map<String, Long> encuestaData = new LinkedHashMap<>();
+        for (Object[] fila : resumen) {
+            String calificacion = String.valueOf(fila[0]);
+            Long cantidad = ((Number) fila[1]).longValue();
+            encuestaData.put(calificacion, cantidad);
         }
-        
-        else if (nombre.equals(prefijoEsperado)) {
-            nombreLimpio = nombre;
+
+        try {
+            String json = new ObjectMapper().writeValueAsString(encuestaData);
+            model.addAttribute("encuestaDataJson", json);
+        } catch (JsonProcessingException e) {
+            model.addAttribute("encuestaDataJson", "{}");
         }
-        
-        return Map.of(
-            "id", id,
-            "nombre", nombreLimpio
-        );
+        List<ModuleSurvey> encuestas = surveyService.obtenerEncuestas();
+        model.addAttribute("encuestas", encuestas);
+
+        return "/admin/modules-admin";
     }
-    
-    
-    private void safeAddAttribute(Model model, String attributeName, Object value) {
-        model.addAttribute(attributeName, value != null ? value : getDefaultValue(attributeName));
+
+    @GetMapping("/modulos/{id}/detalle")
+    public String detalleModulo(@PathVariable Long id, Model model) {
+        System.out.println("Obteniendo detalle del módulo con ID: " + id);
+
+        Module modulo = mservice.buscarPorId(id).orElseThrow();
+
+        List<Activity> actividades = activityService.obtenerActividadesCompletoPorModulo(id);
+
+        model.addAttribute("modulo", modulo);
+        model.addAttribute("actividades", actividades);
+
+        return "fragments/details-modules :: detalleModulo";
     }
-    
-    
-    private Object getDefaultValue(String attributeName) {
-        if (attributeName == null) return null;
-        
-        return switch (attributeName) {
-            case "usuariosPorMes" -> List.of();
-            case "progresoUsuarios", "progresoPorModulo" -> Map.of();
-            case "recentActivity" -> List.of();
-            default -> null;
-        };
+
+    @PostMapping("/modulos/update")
+    public String actualizarModulo(@ModelAttribute("modulo") Module modulo) {
+        mservice.actualizarModuloCompleto(modulo);
+
+        return "redirect:/admin/modulos";
     }
+
+    @PostMapping("/modulos/delete")
+    public String eliminarModulo(@RequestParam("moduloId") Long id) {
+        mservice.eliminarModuloConActividades(id);
+        return "redirect:/admin/modulos";
+    }
+
 }

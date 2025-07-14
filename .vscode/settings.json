@@ -1,5 +1,7 @@
 {
     "java.configuration.updateBuildConfiguration": "disabled",
     "java.compile.nullAnalysis.mode": "disabled",
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.format.settings.url": ".vscode/java-formatter.xml",
+
 }
